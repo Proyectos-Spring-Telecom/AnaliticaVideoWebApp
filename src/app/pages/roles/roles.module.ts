@@ -8,6 +8,7 @@ import { ListaRolesComponent } from './lista-roles/lista-roles.component';
 import { AgregarRolComponent } from './agregar-rol/agregar-rol.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MaterialModule } from 'src/app/material.module';
+import { HasPermissionDirective } from 'src/app/core/haspermission.directive';
 
 
 @NgModule({
@@ -22,7 +23,8 @@ import { MaterialModule } from 'src/app/material.module';
     DxDataGridModule,
     DxButtonModule,
     ReactiveFormsModule,
-    MaterialModule
+    MaterialModule,
+    HasPermissionDirective
   ]
 })
 export class RolesModule { }

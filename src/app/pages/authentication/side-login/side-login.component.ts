@@ -90,7 +90,9 @@ export class AppSideLoginComponent implements OnInit {
         catchError((error: any) => {
           this.loading = false;
           this.textLogin = 'Iniciar Sesión';
-          this.toastr.error(error?.message, '¡Ops!');
+          // Obtener el mensaje del servidor desde error.error.message
+          const errorMessage = error?.error?.message || error?.message || 'Error al iniciar sesión';
+          this.toastr.error(errorMessage, '¡Ops!');
           this.isDisabled = false;
           return throwError(() => '');
         })
@@ -114,5 +116,16 @@ export class AppSideLoginComponent implements OnInit {
   onSubmits() {
     // console.log(this.form.value);
     this.router.navigate(['/monitoreo']);
+  }
+
+  openFacebook() {
+    window.open('https://www.facebook.com/profile.php?id=61579119466053', '_blank');
+  }
+
+  openInstagram() {
+    window.open(
+      'https://www.instagram.com/spring_telecom?fbclid=IwY2xjawPgd-ZleHRuA2FlbQIxMABicmlkETFWcXA1TlhHNEkza3VHQW16c3J0YwZhcHBfaWQQMjIyMDM5MTc4ODIwMDg5MgABHhKPqP9x7y6kKduncrL3ZWgMV5pl48pdF_VN8yg9so_O9zZdq0q1_G-wMD54_aem_lEOCii1Rjv-RdeLXoTG6rA',
+      '_blank'
+    );
   }
 }

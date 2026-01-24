@@ -52,12 +52,17 @@ export class InstalacionService {
     );
   }
 
-  private apiUrl = `${environment.API_SECURITY}/instalacion-equipo`;
-  updateEstatus(id: number, estatus: number): Observable<string> {
-    const url = `${this.apiUrl}/estatus/${id}`;
-    const body = { estatus };
+  activar(id: number): Observable<string> {
+    const url = `${environment.API_SECURITY}/instalacion-equipo/activar/${id}`;
     return this.http
-      .patch(url, body, { responseType: 'text' })
+      .patch(url, {}, { responseType: 'text' })
+      .pipe(catchError((error) => throwError(() => error)));
+  }
+
+  desactivar(id: number): Observable<string> {
+    const url = `${environment.API_SECURITY}/instalacion-equipo/desactivar/${id}`;
+    return this.http
+      .patch(url, {}, { responseType: 'text' })
       .pipe(catchError((error) => throwError(() => error)));
   }
 }

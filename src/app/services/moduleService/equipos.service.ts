@@ -40,20 +40,16 @@ export class EquipoService {
         return this.http.patch<any>(`${environment.API_SECURITY}/equipos/${idMarca}`, saveForm);
     }
 
-    private apiUrl = `${environment.API_SECURITY}/equipos/activar`;
-    private apiUrlDes = `${environment.API_SECURITY}/equipos/desactivar`;
-    updateEstatusActivar(id: number, estatus: number): Observable<string> {
-        const url = `${this.apiUrl}/${id}`;
-        const body = { estatus };
-        return this.http.patch(url, body, { responseType: 'text' }).pipe(
+    activar(id: number): Observable<string> {
+        const url = `${environment.API_SECURITY}/equipos/activar/${id}`;
+        return this.http.patch(url, {}, { responseType: 'text' }).pipe(
             catchError(error => throwError(() => error))
         );
     }
 
-    updateEstatusDesactivar(id: number, estatus: number): Observable<string> {
-        const url = `${this.apiUrlDes}/${id}`;
-        const body = { estatus };
-        return this.http.patch(url, body, { responseType: 'text' }).pipe(
+    desactivar(id: number): Observable<string> {
+        const url = `${environment.API_SECURITY}/equipos/desactivar/${id}`;
+        return this.http.patch(url, {}, { responseType: 'text' }).pipe(
             catchError(error => throwError(() => error))
         );
     }

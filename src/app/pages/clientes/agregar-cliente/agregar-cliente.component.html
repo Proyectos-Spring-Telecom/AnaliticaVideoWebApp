@@ -333,7 +333,7 @@
                                         <div class="uploader__cta">
                                             <button mat-flat-button color="primary" type="button"
                                                 (click)="openLogoFilePicker()">Seleccionar</button>
-                                            <span class="uploader__badge">PNG · JPG</span>
+                                            <span class="uploader__badge">PNG · JPG · JPEG</span>
                                         </div>
 
                                         <div class="uploader__status" *ngIf="clienteForm.get('logotipo')?.value">
@@ -349,7 +349,7 @@
                                             </a>
                                         </div>
 
-                                        <input #logoFileInput type="file" accept="image/png,image/jpeg,image/webp"
+                                        <input #logoFileInput type="file" accept="image/png,image/jpeg,image/jpg"
                                             (change)="onLogoFileSelected($event)" class="uploader__input" />
                                     </div>
                                 </div>

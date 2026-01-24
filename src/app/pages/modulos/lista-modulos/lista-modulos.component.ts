@@ -6,6 +6,7 @@ import CustomStore from 'devextreme/data/custom_store';
 import { lastValueFrom } from 'rxjs';
 import { routeAnimation } from 'src/app/pipe/module-open.animation';
 import { ModulosService } from 'src/app/services/moduleService/modulos.service';
+import { Permiso } from 'src/app/entities/permiso.enum';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -34,6 +35,9 @@ export class ListaModulosComponent implements OnInit {
   isGrouped: boolean = false;
   public paginaActualData: any[] = [];
   public filtroActivo: string = '';
+  
+  // Permisos para usar en el template
+  readonly Permiso = Permiso;
 
   constructor(
     private router: Router,
@@ -283,6 +287,8 @@ export class ListaModulosComponent implements OnInit {
         confirmButtonColor: '#3085d6',
         confirmButtonText: 'Entendido',
         allowOutsideClick: false,
+        background: '#141a21',
+        color: '#ffffff',
       });
     } else {
       this.autoExpandAllGroups = !this.autoExpandAllGroups;

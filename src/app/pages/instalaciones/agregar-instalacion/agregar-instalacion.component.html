@@ -78,19 +78,19 @@
                         </div>
                     </div>
                     <div class="col-12 col-md-4">
-                        <label for="idPiso" class="form-label perm-label">Piso</label>
+                        <label for="nroPiso" class="form-label perm-label">Piso</label>
                         <div class="input-group input-group-lg perm-ig">
                             <span class="input-group-text fw-bold">
                                 <mat-icon aria-hidden="true">layers</mat-icon>
                             </span>
                             <div class="form-floating flex-grow-1 perm-select-floating">
-                                <select class="form-select" id="idPiso" formControlName="idPiso" [disabled]="!insEquipoForm.get('idSedeCentral')?.value">
+                                <select class="form-select" id="nroPiso" formControlName="nroPiso" [disabled]="!insEquipoForm.get('idSedeCentral')?.value">
                                     <option [ngValue]="null" disabled>Selecciona un piso</option>
                                     <option *ngFor="let piso of listaPisos" [ngValue]="piso.id">
                                         {{ piso.nombre || piso.numero || `Piso ${piso.id}` }}
                                     </option>
                                 </select>
-                                <label for="idPiso">Selecciona un piso</label>
+                                <label for="nroPiso">Selecciona un piso</label>
                             </div>
                         </div>
                     </div>

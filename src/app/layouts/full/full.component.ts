@@ -21,6 +21,8 @@ import { AppHorizontalSidebarComponent } from './horizontal/sidebar/sidebar.comp
 import { AppBreadcrumbComponent } from './shared/breadcrumb/breadcrumb.component';
 import { CustomizerComponent } from './shared/customizer/customizer.component';
 import { AppAuthBrandingComponent } from './vertical/sidebar/auth-branding.component';
+import { AuthenticationService } from 'src/app/services/auth.service';
+import { NavItem } from './vertical/sidebar/nav-item/nav-item';
 
 const MOBILE_VIEW = 'screen and (max-width: 768px)';
 const TABLET_VIEW = 'screen and (min-width: 769px) and (max-width: 1024px)';
@@ -64,7 +66,7 @@ interface quicklinks {
   encapsulation: ViewEncapsulation.None,
 })
 export class FullComponent implements OnInit {
-  navItems = navItems;
+  navItems: NavItem[] = [];
 
   @ViewChild('leftsidenav')
   public sidenav: MatSidenav;
@@ -196,7 +198,8 @@ export class FullComponent implements OnInit {
     private mediaMatcher: MediaMatcher,
     private router: Router,
     private breakpointObserver: BreakpointObserver,
-    private navService: NavService
+    private navService: NavService,
+    private authService: AuthenticationService
   ) {
     this.htmlElement = document.querySelector('html')!;
     this.layoutChangesSubscription = this.breakpointObserver
@@ -214,6 +217,9 @@ export class FullComponent implements OnInit {
 
     // Initialize project theme with options
     this.receiveOptions(this.options);
+    
+    // Filtrar elementos del menú según permisos
+    this.navItems = this.filterNavItemsByPermissions(navItems);
   }
 
   ngOnInit(): void {
@@ -276,5 +282,62 @@ export class FullComponent implements OnInit {
 
     // Add the selected theme class
     this.htmlElement.classList.add(options.activeTheme);
+  }
+
+  /**
+   * Verifica si el usuario tiene el permiso requerido
+   */
+  private hasPermission(requiredPermission: number | number[] | undefined): boolean {
+    // Si no hay permiso requerido, siempre mostrar
+    if (!requiredPermission) {
+      return true;
+    }
+
+    const userPermissions = this.authService.getPermissions();
+    const requiredPermissions = Array.isArray(requiredPermission) 
+      ? requiredPermission 
+      : [requiredPermission];
+
+    // Convertir permisos del usuario a strings para comparación
+    const userPermsStr = userPermissions.map(p => String(p));
+    
+    // Verificar si el usuario tiene al menos uno de los permisos requeridos
+    return requiredPermissions.some(reqPerm => {
+      const reqPermStr = String(reqPerm);
+      return userPermsStr.includes(reqPermStr);
+    });
+  }
+
+  /**
+   * Filtra los elementos del menú según los permisos del usuario
+   */
+  private filterNavItemsByPermissions(items: NavItem[]): NavItem[] {
+    return items
+      .filter(item => {
+        // Si es un navCap (encabezado), siempre mostrarlo
+        if (item.navCap) {
+          return true;
+        }
+
+        // Verificar si el usuario tiene el permiso para ver este elemento
+        const hasPermission = this.hasPermission(item.permission);
+        
+        if (!hasPermission) {
+          return false;
+        }
+
+        // Si tiene hijos, filtrar los hijos también
+        if (item.children && item.children.length > 0) {
+          const filteredChildren = this.filterNavItemsByPermissions(item.children);
+          // Si después de filtrar no quedan hijos, ocultar el elemento padre
+          if (filteredChildren.length === 0) {
+            return false;
+          }
+          item.children = filteredChildren;
+        }
+
+        return true;
+      })
+      .map(item => ({ ...item }));
   }
 }

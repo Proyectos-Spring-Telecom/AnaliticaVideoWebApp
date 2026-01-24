@@ -227,6 +227,7 @@ export class ListaClientesComponent implements OnInit {
       html: `Está seguro que requiere eliminar el cliente: <br> ${cliente.NombreCompleto}?`,
       icon: 'warning',
       background: '#141a21',
+        color: '#ffffff',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33',
@@ -238,6 +239,7 @@ export class ListaClientesComponent implements OnInit {
           (response) => {
             Swal.fire({
               background: '#141a21',
+        color: '#ffffff',
               title: '¡Eliminado!',
               html: `El cliente ha sido eliminado de forma exitosa.`,
               icon: 'success',
@@ -265,6 +267,7 @@ export class ListaClientesComponent implements OnInit {
     Swal.fire({
       title: '¡Activar!',
       background: '#141a21',
+      color: '#ffffff',
       html: `¿Está seguro que requiere activar el cliente: <strong>${rowData.nombre}</strong>?`,
       icon: 'warning',
       showCancelButton: true,
@@ -278,6 +281,7 @@ export class ListaClientesComponent implements OnInit {
           (response) => {
             Swal.fire({
               background: '#141a21',
+        color: '#ffffff',
               title: '¡Confirmación Realizada!',
               html: `El cliente ha sido activado.`,
               icon: 'success',
@@ -293,6 +297,7 @@ export class ListaClientesComponent implements OnInit {
             Swal.fire({
               title: '¡Ops!',
               background: '#141a21',
+        color: '#ffffff',
               html: `${error}`,
               icon: 'error',
               confirmButtonColor: '#3085d6',
@@ -311,6 +316,7 @@ export class ListaClientesComponent implements OnInit {
       icon: 'warning',
       showCancelButton: true,
       background: '#141a21',
+        color: '#ffffff',
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33',
       confirmButtonText: 'Confirmar',
@@ -321,6 +327,7 @@ export class ListaClientesComponent implements OnInit {
           (response) => {
             Swal.fire({
               background: '#141a21',
+        color: '#ffffff',
               title: '¡Confirmación Realizada!',
               html: `El cliente ha sido desactivado.`,
               icon: 'success',
@@ -337,6 +344,7 @@ export class ListaClientesComponent implements OnInit {
               html: `${error}`,
               icon: 'error',
               background: '#141a21',
+        color: '#ffffff',
               confirmButtonColor: '#3085d6',
               confirmButtonText: 'Confirmar',
             });
@@ -408,6 +416,7 @@ export class ListaClientesComponent implements OnInit {
     if (groupedColumns.length === 0) {
       Swal.fire({
         background: '#141a21',
+        color: '#ffffff',
         title: '¡Ops!',
         text: 'Debes arrastar un encabezado de una columna para expandir o contraer grupos.',
         icon: 'warning',

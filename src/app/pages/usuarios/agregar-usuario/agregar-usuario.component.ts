@@ -177,7 +177,7 @@ export class AgregarUsuarioComponent implements OnInit {
         telefono: ['', [Validators.required]],
         nombre: ['', [Validators.required]],
         apellidoPaterno: ['', [Validators.required]],
-        apellidoMaterno: ['', [Validators.required]],
+        apellidoMaterno: [''],
         fotoPerfil: [null],
         idRol: [null, [Validators.required]],
         emailConfirmado: [0, [Validators.required]],
