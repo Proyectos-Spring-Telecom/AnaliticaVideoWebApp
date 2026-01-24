@@ -77,7 +77,7 @@ export class ListaInstalacionesComponent implements OnInit {
   activar(rowData: any) {
     Swal.fire({
       title: '¡Activar!',
-      html: `¿Está seguro que requiere activar el módulo: <strong>${rowData.nombre}</strong>?`,
+      html: `¿Está seguro que requiere activar la instalación?`,
       icon: 'warning',
       background: '#141a21',
       color: '#ffffff',
@@ -88,13 +88,13 @@ export class ListaInstalacionesComponent implements OnInit {
       cancelButtonText: 'Cancelar',
     }).then((result) => {
       if (result.value) {
-        this.instalacionService.updateEstatus(rowData.id, 1).subscribe(
+        this.instalacionService.activar(rowData.id).subscribe(
           () => {
             Swal.fire({
               background: '#141a21',
               color: '#ffffff',
               title: '¡Confirmación Realizada!',
-              html: `El módulo ha sido activado.`,
+              html: `La instalación ha sido activada.`,
               icon: 'success',
               confirmButtonColor: '#3085d6',
               confirmButtonText: 'Confirmar',
@@ -122,7 +122,7 @@ export class ListaInstalacionesComponent implements OnInit {
   desactivar(rowData: any) {
     Swal.fire({
       title: '¡Desactivar!',
-      html: `¿Está seguro que requiere desactivar el módulo: <strong>${rowData.nombre}</strong>?`,
+      html: `¿Está seguro que requiere desactivar la instalación?`,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
@@ -133,11 +133,11 @@ export class ListaInstalacionesComponent implements OnInit {
       color: '#ffffff',
     }).then((result) => {
       if (result.value) {
-        this.instalacionService.updateEstatus(rowData.id, 0).subscribe(
+        this.instalacionService.desactivar(rowData.id).subscribe(
           () => {
             Swal.fire({
               title: '¡Confirmación Realizada!',
-              html: `El módulo ha sido desactivado.`,
+              html: `La instalación ha sido desactivada.`,
               icon: 'success',
               confirmButtonColor: '#3085d6',
               confirmButtonText: 'Confirmar',
@@ -291,6 +291,8 @@ export class ListaInstalacionesComponent implements OnInit {
       .filter((col) => (col.groupIndex ?? -1) >= 0);
     if (groupedColumns.length === 0) {
       Swal.fire({
+        background: '#141a21',
+        color: '#ffffff',
         title: '¡Ops!',
         text: 'Debes arrastar un encabezado de una columna para expandir o contraer grupos.',
         icon: 'warning',

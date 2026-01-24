@@ -69,7 +69,7 @@ export class ListaModelosComponent implements OnInit {
   activar(rowData: any) {
     Swal.fire({
       title: '¡Activar!',
-      html: `¿Está seguro que requiere activar la marca: <strong>${rowData.nombre}</strong>?`,
+      html: `¿Está seguro que requiere activar el modelo: <strong>${rowData.nombre}</strong>?`,
       icon: 'warning',
       background: '#141a21',
       color: '#ffffff',
@@ -80,19 +80,19 @@ export class ListaModelosComponent implements OnInit {
       cancelButtonText: 'Cancelar',
     }).then((result) => {
       if (result.value) {
-        this.modeloService.updateEstatusActivar(rowData.id, 1).subscribe(
+        this.modeloService.activar(rowData.id).subscribe(
           (response) => {
             Swal.fire({
               background: '#141a21',
               color: '#ffffff',
               title: '¡Confirmación Realizada!',
-              html: `La marca ha sido activada.`,
+              html: `El modelo ha sido activado.`,
               icon: 'success',
               confirmButtonColor: '#3085d6',
               confirmButtonText: 'Confirmar',
             });
 
-            this.setupDataSource();
+            this.obtenerlistaModelos();
             this.dataGrid.instance.refresh();
             // this.obtenerlistaModelos();
           },
@@ -115,7 +115,7 @@ export class ListaModelosComponent implements OnInit {
   desactivar(rowData: any) {
     Swal.fire({
       title: '¡Desactivar!',
-      html: `¿Está seguro que requiere desactivar la marca: <strong>${rowData.nombre}</strong>?`,
+      html: `¿Está seguro que requiere desactivar el modelo: <strong>${rowData.nombre}</strong>?`,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
@@ -126,18 +126,18 @@ export class ListaModelosComponent implements OnInit {
       color: '#ffffff',
     }).then((result) => {
       if (result.value) {
-        this.modeloService.updateEstatusDesactivar(rowData.id, 0).subscribe(
+        this.modeloService.desactivar(rowData.id).subscribe(
           (response) => {
             Swal.fire({
               title: '¡Confirmación Realizada!',
-              html: `La marca ha sido desactivada.`,
+              html: `El modelo ha sido desactivado.`,
               icon: 'success',
               confirmButtonColor: '#3085d6',
               confirmButtonText: 'Confirmar',
               background: '#141a21',
               color: '#ffffff',
             });
-            this.setupDataSource();
+            this.obtenerlistaModelos();
             this.dataGrid.instance.refresh();
             // this.obtenerlistaModelos();
           },
@@ -271,7 +271,7 @@ export class ListaModelosComponent implements OnInit {
     const today = new Date();
     this.dataGrid.instance.clearGrouping();
     this.isGrouped = false;
-    // this.setupDataSource();
+    this.obtenerlistaModelos();
     this.dataGrid.instance.refresh();
   }
 
@@ -281,6 +281,8 @@ export class ListaModelosComponent implements OnInit {
       .filter((col) => (col.groupIndex ?? -1) >= 0);
     if (groupedColumns.length === 0) {
       Swal.fire({
+        background: '#141a21',
+        color: '#ffffff',
         title: '¡Ops!',
         text: 'Debes arrastar un encabezado de una columna para expandir o contraer grupos.',
         icon: 'warning',

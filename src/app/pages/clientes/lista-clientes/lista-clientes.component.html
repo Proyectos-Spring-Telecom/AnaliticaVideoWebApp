@@ -18,9 +18,11 @@
 
     <div class="surface">
         <div class="d-flex flex-wrap gap-10 justify-content-end w-100">
-            <button (click)="agregarCliente()" mat-flat-button class="bg-secondary">
-                <i class="fa fa-plus"></i> Agregar
-            </button>
+            <div *appHasPermission="'3'">
+                <button (click)="agregarCliente()" mat-flat-button class="bg-secondary">
+                    <i class="fa fa-plus"></i> Agregar
+                </button>
+            </div>
             <button (click)="limpiarCampos()" mat-flat-button class="bg-success">
                 <i class="fa fa-eraser"></i>
                 Limpiar
@@ -46,7 +48,7 @@
                 <dxo-group-panel [emptyPanelText]="mensajeAgrupar" [visible]="true"></dxo-group-panel>
                 <dxo-filter-row [visible]="showFilterRow"></dxo-filter-row>
                 <dxo-header-filter [visible]="showHeaderFilter"></dxo-header-filter>
-                <dxo-grouping [autoExpandAll]="true"></dxo-grouping>
+                <dxo-grouping #expand [autoExpandAll]="autoExpandAllGroups"></dxo-grouping>
                 <dxo-pager [showPageSizeSelector]="true" [allowedPageSizes]="[20]" [showInfo]="true"></dxo-pager>
 
                 <!-- <dxi-column dataField="Logotipo" caption="Logotipo" alignment="center" cellTemplate="cellTemplate">
@@ -54,7 +56,7 @@
             <img [src]="d.data.Logotipo" alt="Logo" width="50">
           </ng-template>
         </dxi-column> -->
-                <dxi-column caption="Acciones" cellTemplate="acciones" alignment="center" [width]="150"></dxi-column>
+                <dxi-column caption="Acciones" cellTemplate="acciones" alignment="center" *appHasPermission="['2', '4']" [width]="150"></dxi-column>
                 <dxi-column dataField="logotipo" caption="Imagen" cellTemplate="imagen" [width]="200"
                     alignment="center">
                     <dxo-header-filter [allowSearch]="true"></dxo-header-filter>
@@ -118,13 +120,13 @@
                     </div>
                 </dxi-column>
                 <div *dxTemplate="let row of 'acciones'" class="d-flex gap-3 justify-content-center">
-                    <div>
+                    <div *appHasPermission="'2'">
                         <button valueExpr="id" id="actualizarButton" class="btnAcciones"
                             (click)="actualizarCliente(row.data.id)">
                             <i class="fa fa-edit"></i>
                         </button>
                     </div>
-                    <div>
+                    <div *appHasPermission="'4'">
                         @if (row.data.estatus === 0) {
                         <button id="pinButton" class="btnAcciones" (click)="activar(row.data)">
                             <i class="fa fa-arrow-up"></i>

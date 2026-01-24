@@ -8,6 +8,7 @@ import { MaterialModule } from 'src/app/material.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ListaInstalacionesComponent } from './lista-instalaciones/lista-instalaciones.component';
 import { AgregarInstalacionComponent } from './agregar-instalacion/agregar-instalacion.component';
+import { HasPermissionDirective } from 'src/app/core/haspermission.directive';
 
 
 @NgModule({
@@ -20,7 +21,8 @@ import { AgregarInstalacionComponent } from './agregar-instalacion/agregar-insta
     DxButtonModule,
     MaterialModule,
     ReactiveFormsModule,
-    FormsModule
+    FormsModule,
+    HasPermissionDirective
   ]
 })
 export class InstalacionesModule { }

@@ -8,6 +8,7 @@ import { ListaClientesComponent } from './lista-clientes/lista-clientes.componen
 import { MaterialModule } from 'src/app/material.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AgregarClienteComponent } from './agregar-cliente/agregar-cliente.component';
+import { HasPermissionDirective } from 'src/app/core/haspermission.directive';
 
 
 @NgModule({
@@ -20,7 +21,8 @@ import { AgregarClienteComponent } from './agregar-cliente/agregar-cliente.compo
     DxButtonModule,
     MaterialModule,
     ReactiveFormsModule,
-    FormsModule
+    FormsModule,
+    HasPermissionDirective
   ]
 })
 export class ClientesModule { }

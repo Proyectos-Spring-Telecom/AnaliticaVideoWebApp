@@ -8,6 +8,7 @@ import { MaterialModule } from 'src/app/material.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ListaDepartamentosComponent } from './lista-departamentos/lista-departamentos.component';
 import { AgregarDepartamentoComponent } from './agregar-departamento/agregar-departamento.component';
+import { HasPermissionDirective } from 'src/app/core/haspermission.directive';
 
 
 @NgModule({
@@ -23,7 +24,8 @@ import { AgregarDepartamentoComponent } from './agregar-departamento/agregar-dep
     DxButtonModule,
     MaterialModule,
     ReactiveFormsModule,
-    FormsModule
+    FormsModule,
+    HasPermissionDirective
   ]
 })
 export class DepartamentosModule { }

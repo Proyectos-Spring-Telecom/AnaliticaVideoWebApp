@@ -27,7 +27,7 @@ export class ListaPermisosComponent implements OnInit {
   public loadingMessage: string = 'Cargando...';
   public paginaActual: number = 1;
   public totalRegistros: number = 0;
-  public pageSize: number = 20;
+  public pageSize: number = 100;
   public totalPaginas: number = 0;
   public data: string;
   public paginaActualData: any[] = [];
@@ -310,7 +310,7 @@ export class ListaPermisosComponent implements OnInit {
           (response) => {
             Swal.fire({
               title: '¡Confirmación Realizada!',
-              html: `El permiso ha sido desactivado`,
+              html: `El permiso ha sido desactivado.`,
               icon: 'success',
               confirmButtonColor: '#3085d6',
               confirmButtonText: 'Confirmar',
@@ -350,6 +350,8 @@ export class ListaPermisosComponent implements OnInit {
       .filter(col => (col.groupIndex ?? -1) >= 0);
     if (groupedColumns.length === 0) {
       Swal.fire({
+        background: '#141a21',
+        color: '#ffffff',
         title: '¡Ops!',
         text: 'Debes arrastar un encabezado de una columna para expandir o contraer grupos.',
         icon: 'warning',

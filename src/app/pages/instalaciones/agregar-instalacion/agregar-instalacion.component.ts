@@ -2,6 +2,7 @@ import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { routeAnimation } from 'src/app/pipe/module-open.animation';
+import { AuthenticationService } from 'src/app/services/auth.service';
 import { ClientesService } from 'src/app/services/moduleService/clientes.service';
 import { EquipoService } from 'src/app/services/moduleService/equipos.service';
 import { InstalacionCentralSede } from 'src/app/services/moduleService/instalacion-central.service';
@@ -31,17 +32,23 @@ export class AgregarInstalacionComponent implements OnInit, AfterViewInit {
   selectedFileName: string = '';
   previewUrl: string | ArrayBuffer | null = null;
 
+  /** Equipo actual al editar; obtenerEquiposDisponibles no lo incluye, se agrega a la lista */
+  private equipoEnEdicion: { id: number; numeroSerie: string } | null = null;
+  /** Departamento actual al editar si viene en get-by-id y no está en la lista */
+  private departamentoEnEdicion: { id: number; nombre: string } | null = null;
+
   constructor(
     private fb: FormBuilder,
     private moduService: ModulosService,
     private activatedRouted: ActivatedRoute,
     private route: Router,
+    private auth: AuthenticationService,
     private clieService: ClientesService,
     private equiposService: EquipoService,
     private sedCentralService: InstalacionCentralSede,
     private instalacionService: InstalacionService,
     private departamentosService: DepartamentosService
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.obtenerEquipos();
@@ -73,7 +80,7 @@ export class AgregarInstalacionComponent implements OnInit, AfterViewInit {
   onSedeCentralChange() {
     const idSedeCentral = this.insEquipoForm.get('idSedeCentral')?.value;
     // Limpiar el select de pisos cuando cambia la instalación central
-    this.insEquipoForm.patchValue({ idPiso: null });
+    this.insEquipoForm.patchValue({ nroPiso: null });
     this.listaPisos = [];
 
     if (idSedeCentral) {
@@ -81,25 +88,27 @@ export class AgregarInstalacionComponent implements OnInit, AfterViewInit {
     }
   }
 
-  obtenerPisos(idInstalacionCentral: number) {
+  obtenerPisos(idInstalacionCentral: number, onLoaded?: () => void) {
     this.sedCentralService.obtenerPisos(idInstalacionCentral).subscribe({
       next: (response: any) => {
         // La respuesta viene como: { "data": [{ "idSedeCentral": 7, "pisos": [1,2,3,4,5] }] }
         const data = response?.data || [];
         if (data.length > 0 && data[0].pisos) {
-          // Mapear el array de números a objetos con id
+          // Mapear el array de números a objetos con id (Number para coincidir con nroPiso)
           this.listaPisos = data[0].pisos.map((numeroPiso: number) => ({
-            id: numeroPiso,
-            numero: numeroPiso,
+            id: Number(numeroPiso),
+            numero: Number(numeroPiso),
             nombre: `Piso ${numeroPiso}`
           }));
         } else {
           this.listaPisos = [];
         }
+        onLoaded?.();
       },
       error: (error: any) => {
         console.error('Error al obtener pisos:', error);
         this.listaPisos = [];
+        onLoaded?.();
       }
     });
   }
@@ -110,7 +119,19 @@ export class AgregarInstalacionComponent implements OnInit, AfterViewInit {
         ...c,
         id: Number(c.id),
       }));
+      this.applyDefaultClienteFromLogin();
     });
+  }
+
+  private applyDefaultClienteFromLogin(): void {
+    if (this.idInstalacion) return;
+    const u = this.auth.getUser();
+    const idCliente = u?.idCliente != null ? Number(u.idCliente) : null;
+    if (idCliente == null) return;
+    const existe = this.listaClientes.some((c) => Number(c.id) === idCliente);
+    if (existe && this.insEquipoForm) {
+      this.insEquipoForm.patchValue({ idCliente });
+    }
   }
 
   obtenerEquipos() {
@@ -119,6 +140,10 @@ export class AgregarInstalacionComponent implements OnInit, AfterViewInit {
         ...c,
         id: Number(c.id),
       }));
+      // Si estamos editando y el equipo actual no está (disponibles excluye instalados), agregarlo
+      if (this.equipoEnEdicion && !this.listaEquipos.some((e: any) => Number(e.id) === this.equipoEnEdicion!.id)) {
+        this.listaEquipos = [this.equipoEnEdicion as any, ...this.listaEquipos];
+      }
     });
   }
 
@@ -128,27 +153,57 @@ export class AgregarInstalacionComponent implements OnInit, AfterViewInit {
         id: Number(d.id),
         nombre: d.nombre,
       }));
+      // Si estamos editando y el departamento actual vino en get-by-id y no está, agregarlo
+      if (this.departamentoEnEdicion && !this.listaDepartamentos.some((d: any) => Number(d.id) === this.departamentoEnEdicion!.id)) {
+        this.listaDepartamentos = [this.departamentoEnEdicion as any, ...this.listaDepartamentos];
+      }
     });
   }
 
   obtenerInstalacion() {
     this.instalacionService.obtenerInstalacion(this.idInstalacion).subscribe(
       (response: any) => {
-        const data = response.data ?? response;
+        const data = response?.data ?? response;
+
+        // Asegurar que el equipo actual esté en la lista (obtenerEquiposDisponibles no incluye instalados)
+        if (data.equipo && data.idEquipo != null) {
+          const idEq = Number(data.idEquipo);
+          this.equipoEnEdicion = { id: idEq, numeroSerie: data.equipo.numeroSerie ?? `Equipo ${idEq}` };
+          const yaEsta = this.listaEquipos.some((e: any) => Number(e.id) === idEq);
+          if (!yaEsta) {
+            this.listaEquipos = [this.equipoEnEdicion as any, ...this.listaEquipos];
+          }
+        }
+
+        // Asegurar que el departamento actual esté en la lista si viene en la respuesta
+        if (data.idDepartamento != null) {
+          const idDepto = Number(data.idDepartamento);
+          const nombre = data.departamento?.nombre ?? data.nombreDepartamento ?? `Departamento ${idDepto}`;
+          this.departamentoEnEdicion = { id: idDepto, nombre };
+          const yaEsta = this.listaDepartamentos.some((d: any) => Number(d.id) === idDepto);
+          if (!yaEsta) {
+            this.listaDepartamentos = [this.departamentoEnEdicion as any, ...this.listaDepartamentos];
+          }
+        }
+
+        const nroPisoVal = data.nroPiso != null ? Number(data.nroPiso) : null;
+        const idDeptoVal = data.idDepartamento != null ? Number(data.idDepartamento) : null;
 
         this.insEquipoForm.patchValue({
-          idEquipo: data.idEquipo,
-          idCliente: data.idCliente,
-          idSedeCentral: data.idSedeCentral,
+          idEquipo: data.idEquipo != null ? Number(data.idEquipo) : '',
+          idCliente: data.idCliente != null ? Number(data.idCliente) : '',
+          idSedeCentral: data.idSedeCentral != null ? Number(data.idSedeCentral) : '',
           lat: data.lat,
           lng: data.lng,
-          idPiso: data.idPiso,
-          idDepartamento: data.idDepartamento,
+          nroPiso: nroPisoVal,
+          idDepartamento: idDeptoVal,
         });
 
-        // Si hay una instalación central, cargar los pisos
+        // Cargar pisos y, después de cargar, re-aplicar nroPiso para que el select muestre el valor
         if (data.idSedeCentral) {
-          this.obtenerPisos(data.idSedeCentral);
+          this.obtenerPisos(Number(data.idSedeCentral), () => {
+            this.insEquipoForm.patchValue({ nroPiso: nroPisoVal });
+          });
         }
 
         this.latSeleccionada = Number(data.lat);
@@ -166,7 +221,7 @@ export class AgregarInstalacionComponent implements OnInit, AfterViewInit {
       lng: ['', Validators.required],
       idCliente: ['', Validators.required],
       idSedeCentral: ['', Validators.required],
-      idPiso: [null],
+      nroPiso: [null],
       idDepartamento: [null],
     });
   }
@@ -247,7 +302,7 @@ export class AgregarInstalacionComponent implements OnInit, AfterViewInit {
       idEquipo: Number(this.insEquipoForm.value.idEquipo),
       idCliente: Number(this.insEquipoForm.value.idCliente),
       idSedeCentral: Number(this.insEquipoForm.value.idSedeCentral),
-      idPiso: this.insEquipoForm.value.idPiso ? Number(this.insEquipoForm.value.idPiso) : null,
+      nroPiso: this.insEquipoForm.value.nroPiso ? Number(this.insEquipoForm.value.nroPiso) : null,
       idDepartamento: this.insEquipoForm.value.idDepartamento ? Number(this.insEquipoForm.value.idDepartamento) : null,
       lat: Number(this.latSeleccionada),
       lng: Number(this.lngSeleccionada),
@@ -352,7 +407,7 @@ export class AgregarInstalacionComponent implements OnInit, AfterViewInit {
       lng: Number(this.lngSeleccionada),
       idCliente: Number(this.insEquipoForm.value.idCliente),
       idSedeCentral: Number(this.insEquipoForm.value.idSedeCentral),
-      idPiso: this.insEquipoForm.value.idPiso ? Number(this.insEquipoForm.value.idPiso) : null,
+      nroPiso: this.insEquipoForm.value.nroPiso ? Number(this.insEquipoForm.value.nroPiso) : null,
       idDepartamento: this.insEquipoForm.value.idDepartamento ? Number(this.insEquipoForm.value.idDepartamento) : null,
     };
 

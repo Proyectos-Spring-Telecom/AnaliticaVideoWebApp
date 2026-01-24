@@ -3,6 +3,7 @@ import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { routeAnimation } from 'src/app/pipe/module-open.animation';
+import { AuthenticationService } from 'src/app/services/auth.service';
 import { InstalacionCentral } from 'src/app/services/moduleService/instalacionesCentral.service';
 
 declare const google: any;
@@ -21,6 +22,9 @@ export class MonitoreoComponent implements OnInit, AfterViewInit, OnDestroy {
   selectedId?: number;
   viewMode: ViewMode = 'centrales';
   selectedCentral: any | null = null;
+
+  /** Solo rol 1 ve la lista de Clientes; el resto solo sus Instalaciones. */
+  isRol1 = false;
 
   private map?: any;
   private markers: any[] = [];
@@ -49,10 +53,18 @@ export class MonitoreoComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(
     private insService: InstalacionCentral,
     private router: Router,
-    private toastr: ToastrService
-  ) { }
+    private toastr: ToastrService,
+    private auth: AuthenticationService
+  ) {}
+
+  private checkRol(): void {
+    const u = this.auth.getUser();
+    const rol = u?.rol != null ? Number(u.rol) : null;
+    this.isRol1 = rol === 1;
+  }
 
   ngOnInit(): void {
+    this.checkRol();
     this.obtenerInstalacionesCentral();
   }
 
@@ -79,9 +91,23 @@ export class MonitoreoComponent implements OnInit, AfterViewInit, OnDestroy {
 
   obtenerInstalacionesCentral() {
     this.insService.obtenerInstalacionCentral().subscribe((response: any) => {
-      this.listaInstalaciones = response?.data ?? [];
-      this.viewMode = 'centrales';
-      this.selectedCentral = null;
+      let data: any[] = response?.data ?? [];
+      const u = this.auth.getUser();
+      const idCliente = u?.idCliente != null ? u.idCliente : null;
+
+      if (this.isRol1) {
+        this.listaInstalaciones = data;
+        this.viewMode = 'centrales';
+        this.selectedCentral = null;
+      } else {
+        const filtered = data.filter(
+          (c: any) => c?.idCliente == idCliente || c?.id == idCliente
+        );
+        this.listaInstalaciones = filtered;
+        this.selectedCentral = filtered.length ? filtered[0] : null;
+        this.viewMode = 'instalaciones';
+      }
+
       if (this.map) this.renderAccordingMode();
     });
   }

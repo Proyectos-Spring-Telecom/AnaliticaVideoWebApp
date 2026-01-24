@@ -8,6 +8,7 @@ import { MaterialModule } from 'src/app/material.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ListaMarcasComponent } from './lista-marcas/lista-marcas.component';
 import { AgregarMarcaComponent } from './agregar-marca/agregar-marca.component';
+import { HasPermissionDirective } from 'src/app/core/haspermission.directive';
 
 
 @NgModule({
@@ -23,7 +24,8 @@ import { AgregarMarcaComponent } from './agregar-marca/agregar-marca.component';
     DxButtonModule,
     MaterialModule,
     ReactiveFormsModule,
-    FormsModule
+    FormsModule,
+    HasPermissionDirective
   ]
 })
 export class MarcasModule { }
