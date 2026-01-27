@@ -288,56 +288,72 @@ export class FullComponent implements OnInit {
    * Verifica si el usuario tiene el permiso requerido
    */
   private hasPermission(requiredPermission: number | number[] | undefined): boolean {
-    // Si no hay permiso requerido, siempre mostrar
-    if (!requiredPermission) {
-      return true;
-    }
+    if (!requiredPermission) return true;
 
     const userPermissions = this.authService.getPermissions();
-    const requiredPermissions = Array.isArray(requiredPermission) 
-      ? requiredPermission 
+    const requiredPermissions = Array.isArray(requiredPermission)
+      ? requiredPermission
       : [requiredPermission];
-
-    // Convertir permisos del usuario a strings para comparación
     const userPermsStr = userPermissions.map(p => String(p));
-    
-    // Verificar si el usuario tiene al menos uno de los permisos requeridos
-    return requiredPermissions.some(reqPerm => {
-      const reqPermStr = String(reqPerm);
-      return userPermsStr.includes(reqPermStr);
-    });
+
+    return requiredPermissions.some(reqPerm =>
+      userPermsStr.includes(String(reqPerm))
+    );
   }
 
   /**
-   * Filtra los elementos del menú según los permisos del usuario
+   * Indica si un ítem (no navCap) debe mostrarse por permisos. Retorna el ítem
+   * con hijos filtrados o null si no debe mostrarse.
+   */
+  private keepItemByPermission(item: NavItem): NavItem | null {
+    if (item.permission !== undefined && !this.hasPermission(item.permission)) {
+      return null;
+    }
+    if (item.children && item.children.length > 0) {
+      const filteredChildren = this.filterNavItemsByPermissions(item.children);
+      if (filteredChildren.length === 0) return null;
+      return { ...item, children: filteredChildren };
+    }
+    return { ...item };
+  }
+
+  /**
+   * Filtra los elementos del menú según permisos. Oculta los apartados (navCap)
+   * que no tengan ningún ítem visible.
    */
   private filterNavItemsByPermissions(items: NavItem[]): NavItem[] {
-    return items
-      .filter(item => {
-        // Si es un navCap (encabezado), siempre mostrarlo
-        if (item.navCap) {
-          return true;
+    const result: NavItem[] = [];
+    let i = 0;
+
+    while (i < items.length) {
+      const item = items[i];
+
+      if (item.navCap) {
+        const section: NavItem[] = [item];
+        let j = i + 1;
+        while (j < items.length && !items[j].navCap) {
+          section.push(items[j]);
+          j++;
         }
 
-        // Verificar si el usuario tiene el permiso para ver este elemento
-        const hasPermission = this.hasPermission(item.permission);
-        
-        if (!hasPermission) {
-          return false;
+        const visible: NavItem[] = [];
+        for (let k = 1; k < section.length; k++) {
+          const kept = this.keepItemByPermission(section[k]);
+          if (kept) visible.push(kept);
         }
 
-        // Si tiene hijos, filtrar los hijos también
-        if (item.children && item.children.length > 0) {
-          const filteredChildren = this.filterNavItemsByPermissions(item.children);
-          // Si después de filtrar no quedan hijos, ocultar el elemento padre
-          if (filteredChildren.length === 0) {
-            return false;
-          }
-          item.children = filteredChildren;
+        if (visible.length > 0) {
+          result.push(section[0]);
+          result.push(...visible);
         }
+        i = j;
+      } else {
+        const kept = this.keepItemByPermission(item);
+        if (kept) result.push(kept);
+        i++;
+      }
+    }
 
-        return true;
-      })
-      .map(item => ({ ...item }));
+    return result;
   }
 }

@@ -4,8 +4,8 @@
       <div class="p-24 h-100">
         <!-- <app-auth-branding></app-auth-branding> -->
 
-        <div class="align-items-center justify-content-center img-height d-none d-lg-flex">
-          <img src="./assets/images/logos/SPRING-VERTICAL.webp" alt="login" style="max-width: 500px" />
+        <div class="d-flex align-items-center justify-content-center img-height img-height-mobile">
+          <img src="./assets/images/logos/SPRING-VERTICAL.webp" alt="login" class="login-img" />
         </div>
       </div>
     </div>
@@ -39,10 +39,8 @@
 
 
               <div class="d-flex align-items-center m-b-12">
-                <!-- <mat-checkbox color="primary"
-                  >Remember this Device</mat-checkbox
-                > -->
-                <a class="text-primary f-w-600 text-decoration-none m-l-auto f-s-14">Olvidó su Contraseña?</a>
+                <a [routerLink]="['/solicitud-cambio-password']" class="solicitud-password-link text-decoration-none f-w-500 f-s-14 m-l-auto">
+                  ¿Olvidó su Contraseña?</a>
               </div>
               <button mat-flat-button color="primary" (click)="onSubmit()" [disabled]="isDisabled" class="w-100">
                 {{textLogin}}

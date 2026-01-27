@@ -18,6 +18,7 @@ import { AuthenticationService } from 'src/app/services/auth.service';
 import { catchError, throwError } from 'rxjs';
 import Swal from 'sweetalert2';
 import { ToastrService } from 'ngx-toastr';
+import { Permiso } from 'src/app/entities/permiso.enum';
 
 @Component({
   selector: 'app-side-login',
@@ -101,7 +102,9 @@ export class AppSideLoginComponent implements OnInit {
         this.isDisabled = false;
         this.auth.setData(result);
 
-        this.router.navigate(['/monitoreo']);
+        const perms = this.auth.getPermissions() || [];
+        const hasMonitoreo = perms.includes(String(Permiso.CONSULTAR_MONITOREO));
+        this.router.navigate(hasMonitoreo ? ['/monitoreo'] : ['/usuarios/perfil-usuario']);
 
         this.toastr.success(
           'Bienvenido al Sistema.',
