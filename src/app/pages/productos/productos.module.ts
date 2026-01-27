@@ -8,6 +8,7 @@ import { MaterialModule } from 'src/app/material.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ListaProductosComponent } from './lista-productos/lista-productos.component';
 import { AgregarProductoComponent } from './agregar-producto/agregar-producto.component';
+import { HasPermissionDirective } from 'src/app/core/haspermission.directive';
 
 
 @NgModule({
@@ -23,7 +24,8 @@ import { AgregarProductoComponent } from './agregar-producto/agregar-producto.co
     DxButtonModule,
     MaterialModule,
     ReactiveFormsModule,
-    FormsModule
+    FormsModule,
+    HasPermissionDirective
   ]
 })
 export class ProductosModule { }

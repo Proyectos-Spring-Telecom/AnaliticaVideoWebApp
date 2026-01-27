@@ -1,26 +1,28 @@
 <div [@routeAnimation] class="card card--panel perm-wrapper">
-    <header class="perm-head" role="region" aria-label="Sección: Instalaciones Centrales">
+    <header class="perm-head" role="region" aria-label="Sección: Oficinas Centrales">
         <div class="perm-head__icon" aria-hidden="true">
             <mat-icon>hub</mat-icon>
         </div>
 
         <div class="perm-head__text">
             <span class="eyebrow">Sección</span>
-            <h2>Instalaciones Centrales</h2>
+            <h2>Oficinas Centrales</h2>
         </div>
 
         <nav class="perm-head__crumbs" aria-label="Ruta">
             <span class="crumb">Administración</span>
             <span class="sep">/</span>
-            <span class="crumb active">Instalaciones Centrales</span>
+            <span class="crumb active">Oficinas Centrales</span>
         </nav>
     </header>
 
     <div class="surface">
         <div class="d-flex flex-wrap gap-10 justify-content-end w-100">
-            <button mat-flat-button class="bg-secondary" (click)="agregarInsCentral()">
-                <i class="fa fa-plus"></i> Agregar
-            </button>
+            <div *appHasPermission="'35'">
+                <button mat-flat-button class="bg-secondary" (click)="agregarInsCentral()">
+                    <i class="fa fa-plus"></i> Agregar
+                </button>
+            </div>
             <button (click)="limpiarCampos()" mat-flat-button class="bg-success">
                 <i class="fa fa-eraser"></i>
                 Limpiar
@@ -48,9 +50,9 @@
                 <dxo-group-panel [emptyPanelText]="mensajeAgrupar" [visible]="true"></dxo-group-panel>
                 <dxo-filter-row [visible]="showFilterRow"></dxo-filter-row>
                 <dxo-header-filter [visible]="showHeaderFilter"></dxo-header-filter>
-                <dxo-grouping [autoExpandAll]="true"></dxo-grouping>
+                <dxo-grouping #expand [autoExpandAll]="autoExpandAllGroups"></dxo-grouping>
 
-                <dxi-column caption="Acciones" cellTemplate="Acciones" alignment="center" dataType="string"
+                <dxi-column caption="Acciones" cellTemplate="Acciones" alignment="center" *appHasPermission="['36', '38']" dataType="string"
                     [width]="220"></dxi-column>
 
                 <dxi-column dataField="nombreCliente" caption="Cliente" alignment="center"
@@ -146,13 +148,13 @@
                 <dxo-master-detail [enabled]="true" template="detail"></dxo-master-detail>
 
                 <div *dxTemplate="let row of 'Acciones'" class="d-flex gap-3 justify-content-center">
-                    <div>
+                    <div *appHasPermission="'36'">
                         <button valueExpr="id" id="actualizarButton" class="btnAcciones"
                             (click)="actualizarCede(row.data.id)">
                             <i class="fa fa-edit"></i>
                         </button>
                     </div>
-                    <div>
+                    <div *appHasPermission="'38'">
                         @if (row.data.estatus === 0) {
                         <button id="pinButton" class="btnAcciones" (click)="activar(row.data)">
                             <i class="fa fa-arrow-up"></i>

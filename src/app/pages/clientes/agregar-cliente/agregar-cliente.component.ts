@@ -615,8 +615,13 @@ export class AgregarClienteComponent implements OnInit {
     return /\.(png|jpe?g|webp|gif|bmp|svg|avif)(\?.*)?$/i.test(u);
   }
 
+  private isLogoImage(file: File): boolean {
+    if (!file?.type) return /\.(png|jpe?g)$/i.test(file.name);
+    return /^image\/(png|jpe?g)$/i.test(file.type);
+  }
+
   private isAllowedLogo(file: File): boolean {
-    const okType = this.isImage(file) || this.isPdf(file);
+    const okType = this.isLogoImage(file);
     const okSize = file.size <= this.MAX_MB * 1024 * 1024;
     return okType && okSize;
   }
@@ -669,6 +674,15 @@ export class AgregarClienteComponent implements OnInit {
   private handleLogoFile(file: File) {
     if (!this.isAllowedLogo(file)) {
       this.clienteForm.get('logotipo')?.setErrors({ invalid: true });
+      if (!this.isLogoImage(file)) {
+        Swal.fire({
+          color: '#ffffff',
+          background: '#141a21',
+          icon: 'warning',
+          title: 'Formato no permitido',
+          text: 'El logotipo solo acepta PNG, JPG o JPEG.'
+        });
+      }
       return;
     }
 

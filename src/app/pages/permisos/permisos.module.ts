@@ -8,6 +8,7 @@ import { ListaPermisosComponent } from './lista-permisos/lista-permisos.componen
 import { MaterialModule } from 'src/app/material.module';
 import { AgregarPermisoComponent } from './agregar-permiso/agregar-permiso.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { HasPermissionDirective } from 'src/app/core/haspermission.directive';
 
 @NgModule({
   declarations: [
@@ -22,7 +23,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     DxButtonModule,
     MaterialModule,
     ReactiveFormsModule,
-    FormsModule
+    FormsModule,
+    HasPermissionDirective
   ],
 })
 export class PermisosModule {}

@@ -8,12 +8,14 @@ import { ListaUsuariosComponent } from './lista-usuarios/lista-usuarios.componen
 import { AgregarUsuarioComponent } from './agregar-usuario/agregar-usuario.component';
 import { MaterialModule } from 'src/app/material.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { PerfilUsuarioComponent } from './perfil-usuario/perfil-usuario.component';
 
 
 @NgModule({
   declarations: [
     ListaUsuariosComponent,
-    AgregarUsuarioComponent
+    AgregarUsuarioComponent,
+    PerfilUsuarioComponent
   ],
   imports: [
     CommonModule,

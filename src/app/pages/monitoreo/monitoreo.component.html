@@ -24,13 +24,13 @@
           <div class="card-header d-flex align-items-center justify-content-between">
             <div>
               <ng-container *ngIf="viewMode === 'centrales'; else headerInstalaciones">
-                Instalaciones Centrales
+                Clientes
               </ng-container>
               <ng-template #headerInstalaciones>
                 Instalaciones del cliente: {{ selectedCentral?.nombreCliente }}
               </ng-template>
             </div>
-            <button *ngIf="viewMode === 'instalaciones'" type="button" class="btn btn-sm" (click)="goToCentrales()">
+            <button *ngIf="isRol1 && viewMode === 'instalaciones'" type="button" class="btn btn-sm" (click)="goToCentrales()">
               Centrales
             </button>
           </div>
@@ -45,7 +45,7 @@
                   <div>
                     <div class="insta-title">
                       <ng-container *ngIf="viewMode === 'centrales'; else tituloInstalacion">
-                        <strong>Instalación:</strong> {{ item.nombreInstalacion || item.nombre || 'Instalación' }}
+                        <strong>Oficina Central:</strong> {{ item.nombreInstalacion || item.nombre || 'Instalación' }}
                       </ng-container>
                       <ng-template #tituloInstalacion>
                         <strong>Equipo:</strong>
@@ -114,8 +114,10 @@
                   <mat-icon>location_off</mat-icon>
                 </div>
                 <div class="insta-empty-text">
-                  <h6>Sin instalaciones registradas</h6>
-                  <p>Este cliente aún no tiene instalaciones registradas.</p>
+                  <h6 *ngIf="!isRol1 && !selectedCentral">Sin oficina central asignada</h6>
+                  <h6 *ngIf="isRol1 || selectedCentral">Sin instalaciones registradas</h6>
+                  <p *ngIf="!isRol1 && !selectedCentral">No tiene asignada una oficina central para ver sus instalaciones.</p>
+                  <p *ngIf="selectedCentral">Este cliente aún no tiene instalaciones registradas.</p>
                 </div>
               </div>
             </ng-template>

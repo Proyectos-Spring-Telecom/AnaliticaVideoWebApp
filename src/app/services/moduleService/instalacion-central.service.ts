@@ -52,12 +52,17 @@ export class InstalacionCentralSede {
     );
   }
 
-  private apiUrl = `${environment.API_SECURITY}/instalacion-central`;
-  updateEstatus(id: number, estatus: number): Observable<string> {
-    const url = `${this.apiUrl}/estatus/${id}`;
-    const body = { estatus };
+  activar(id: number): Observable<string> {
+    const url = `${environment.API_SECURITY}/instalacion-central/activar/${id}`;
     return this.http
-      .patch(url, body, { responseType: 'text' })
+      .patch(url, {}, { responseType: 'text' })
+      .pipe(catchError((error) => throwError(() => error)));
+  }
+
+  desactivar(id: number): Observable<string> {
+    const url = `${environment.API_SECURITY}/instalacion-central/desactivar/${id}`;
+    return this.http
+      .patch(url, {}, { responseType: 'text' })
       .pipe(catchError((error) => throwError(() => error)));
   }
 

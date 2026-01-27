@@ -265,6 +265,8 @@ export class ListaDepartamentosComponent implements OnInit {
       .filter((col) => (col.groupIndex ?? -1) >= 0);
     if (groupedColumns.length === 0) {
       Swal.fire({
+        background: '#141a21',
+        color: '#ffffff',
         title: '¡Ops!',
         text: 'Debes arrastrar un encabezado de una columna para expandir o contraer grupos.',
         icon: 'warning',

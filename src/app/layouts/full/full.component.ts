@@ -21,6 +21,8 @@ import { AppHorizontalSidebarComponent } from './horizontal/sidebar/sidebar.comp
 import { AppBreadcrumbComponent } from './shared/breadcrumb/breadcrumb.component';
 import { CustomizerComponent } from './shared/customizer/customizer.component';
 import { AppAuthBrandingComponent } from './vertical/sidebar/auth-branding.component';
+import { AuthenticationService } from 'src/app/services/auth.service';
+import { NavItem } from './vertical/sidebar/nav-item/nav-item';
 
 const MOBILE_VIEW = 'screen and (max-width: 768px)';
 const TABLET_VIEW = 'screen and (min-width: 769px) and (max-width: 1024px)';
@@ -64,7 +66,7 @@ interface quicklinks {
   encapsulation: ViewEncapsulation.None,
 })
 export class FullComponent implements OnInit {
-  navItems = navItems;
+  navItems: NavItem[] = [];
 
   @ViewChild('leftsidenav')
   public sidenav: MatSidenav;
@@ -196,7 +198,8 @@ export class FullComponent implements OnInit {
     private mediaMatcher: MediaMatcher,
     private router: Router,
     private breakpointObserver: BreakpointObserver,
-    private navService: NavService
+    private navService: NavService,
+    private authService: AuthenticationService
   ) {
     this.htmlElement = document.querySelector('html')!;
     this.layoutChangesSubscription = this.breakpointObserver
@@ -214,6 +217,9 @@ export class FullComponent implements OnInit {
 
     // Initialize project theme with options
     this.receiveOptions(this.options);
+    
+    // Filtrar elementos del menú según permisos
+    this.navItems = this.filterNavItemsByPermissions(navItems);
   }
 
   ngOnInit(): void {
@@ -276,5 +282,78 @@ export class FullComponent implements OnInit {
 
     // Add the selected theme class
     this.htmlElement.classList.add(options.activeTheme);
+  }
+
+  /**
+   * Verifica si el usuario tiene el permiso requerido
+   */
+  private hasPermission(requiredPermission: number | number[] | undefined): boolean {
+    if (!requiredPermission) return true;
+
+    const userPermissions = this.authService.getPermissions();
+    const requiredPermissions = Array.isArray(requiredPermission)
+      ? requiredPermission
+      : [requiredPermission];
+    const userPermsStr = userPermissions.map(p => String(p));
+
+    return requiredPermissions.some(reqPerm =>
+      userPermsStr.includes(String(reqPerm))
+    );
+  }
+
+  /**
+   * Indica si un ítem (no navCap) debe mostrarse por permisos. Retorna el ítem
+   * con hijos filtrados o null si no debe mostrarse.
+   */
+  private keepItemByPermission(item: NavItem): NavItem | null {
+    if (item.permission !== undefined && !this.hasPermission(item.permission)) {
+      return null;
+    }
+    if (item.children && item.children.length > 0) {
+      const filteredChildren = this.filterNavItemsByPermissions(item.children);
+      if (filteredChildren.length === 0) return null;
+      return { ...item, children: filteredChildren };
+    }
+    return { ...item };
+  }
+
+  /**
+   * Filtra los elementos del menú según permisos. Oculta los apartados (navCap)
+   * que no tengan ningún ítem visible.
+   */
+  private filterNavItemsByPermissions(items: NavItem[]): NavItem[] {
+    const result: NavItem[] = [];
+    let i = 0;
+
+    while (i < items.length) {
+      const item = items[i];
+
+      if (item.navCap) {
+        const section: NavItem[] = [item];
+        let j = i + 1;
+        while (j < items.length && !items[j].navCap) {
+          section.push(items[j]);
+          j++;
+        }
+
+        const visible: NavItem[] = [];
+        for (let k = 1; k < section.length; k++) {
+          const kept = this.keepItemByPermission(section[k]);
+          if (kept) visible.push(kept);
+        }
+
+        if (visible.length > 0) {
+          result.push(section[0]);
+          result.push(...visible);
+        }
+        i = j;
+      } else {
+        const kept = this.keepItemByPermission(item);
+        if (kept) result.push(kept);
+        i++;
+      }
+    }
+
+    return result;
   }
 }

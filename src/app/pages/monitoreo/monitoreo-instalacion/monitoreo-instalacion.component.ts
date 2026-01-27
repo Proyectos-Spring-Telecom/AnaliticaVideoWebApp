@@ -94,7 +94,7 @@ export class MonitoreoInstalacionComponent implements OnInit {
   ) { }
 
   regresar(){
-    this.router.navigateByUrl('/monitoreo')
+    window.history.back();
   }
 
   ngOnInit(): void {
@@ -105,9 +105,12 @@ export class MonitoreoInstalacionComponent implements OnInit {
       return;
     }
 
+    // Fecha fin: hoy a la hora actual
     this.fechaFin = new Date();
-    this.fechaInicio = new Date(this.fechaFin);
-    this.fechaInicio.setDate(this.fechaFin.getDate() - 7);
+    
+    // Fecha inicio: hoy a las 00:00:00
+    this.fechaInicio = new Date();
+    this.fechaInicio.setHours(0, 0, 0, 0);
 
     this.socket = io('https://springtelecom.mx/api/incidencias', {
       path: '/analiticaVideoAPI/socket.io',
@@ -200,7 +203,47 @@ export class MonitoreoInstalacionComponent implements OnInit {
           const regs = items.map(this.normalizeItem);
           this.registros = regs;
           this.totalFiltrado = Number(resp?.total ?? regs.length);
-          this.recalcularDesdeRegistros(regs);
+          
+          // Si el backend devuelve datos agregados, usarlos (como en cargarHoy)
+          if (resp?.totales) {
+            this.totalPersonas = Number(resp.totales.total ?? this.totalPersonas);
+            this.totalHombres = Number(resp.totales.hombres ?? this.totalHombres);
+            this.totalMujeres = Number(resp.totales.mujeres ?? this.totalMujeres);
+            this.chartHits = [
+              { grupo: 'Hombres', valor: this.totalHombres, colors: 2 },
+              { grupo: 'Mujeres', valor: this.totalMujeres, colors: 1 },
+            ];
+          } else {
+            // Si no hay totales del backend, recalcular desde registros
+            this.recalcularDesdeRegistros(regs);
+          }
+          
+          // Actualizar gráficas de edades si vienen del backend
+          if (Array.isArray(resp?.edadesAmbos)) {
+            this.chartEdadesAmbos = this.ensureEdadShape(resp.edadesAmbos);
+          } else {
+            // Si no vienen del backend, ya se calcularon en recalcularDesdeRegistros
+          }
+          
+          if (Array.isArray(resp?.edadesMujeres)) {
+            this.chartEdadesMujeres = this.ensureEdadShape(resp.edadesMujeres);
+          }
+          
+          if (Array.isArray(resp?.edadesHombres)) {
+            this.chartEdadesHombres = this.ensureEdadShape(resp.edadesHombres);
+          }
+          
+          // Actualizar gráfica de hits por hora si viene del backend
+          if (Array.isArray(resp?.hitsPorHora)) {
+            this.hitsPorHora = this.normalizarHoras(resp.hitsPorHora);
+          } else {
+            // Si no viene del backend, ya se calculó en recalcularDesdeRegistros
+          }
+          
+          // Si no hay datos agregados del backend, recalcular todo desde registros
+          if (!resp?.totales && !Array.isArray(resp?.edadesAmbos) && !Array.isArray(resp?.hitsPorHora)) {
+            this.recalcularDesdeRegistros(regs);
+          }
         },
         error: () => { },
         complete: () => (this.loading = false),
@@ -291,13 +334,13 @@ export class MonitoreoInstalacionComponent implements OnInit {
   });
 
   customizePoint = (p: any) => {
-    if (p?.seriesName === 'Mujeres') return { color: '#ff69b4' };
-    if (p?.seriesName === 'Hombres') return { color: '#4a90e2' };
+    if (p?.seriesName === 'Mujeres') return { color: '#f87171' };
+    if (p?.seriesName === 'Hombres') return { color: '#0ea5e9' };
     switch (p?.data?.colors) {
       case 1:
-        return { color: '#ff69b4' };
+        return { color: '#f87171' };
       case 2:
-        return { color: '#4a90e2' };
+        return { color: '#0ea5e9' };
       default:
         return {};
     }
@@ -315,20 +358,20 @@ export class MonitoreoInstalacionComponent implements OnInit {
 
   customizeEdadMujeresPoint = (p: any) => {
     const colorMap: any = {
-      1: '#ff69b4',
-      2: '#f06292',
-      3: '#ec407a',
-      4: '#c2185b',
+      1: '#f87171',
+      2: '#fb7185',
+      3: '#fda4af',
+      4: '#ef4444',
     };
     return { color: colorMap[p.data.color] || '#e1bee7' };
   };
 
   customizeEdadHombresPoint = (p: any) => {
     const colorMap: any = {
-      1: '#0d6efd',
-      2: '#3b8beb',
-      3: '#5caeff',
-      4: '#b6d4fe',
+      1: '#06b6d4',
+      2: '#0ea5e9',
+      3: '#38bdf8',
+      4: '#7dd3fc',
     };
     return { color: colorMap[p.data.color] || '#cfd8dc' };
   };

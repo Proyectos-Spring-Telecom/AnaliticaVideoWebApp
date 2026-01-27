@@ -1,13 +1,28 @@
 <div [@routeAnimation] class="card card--panel perm-wrapper">
 
-  <section class="container-fluid mt-1 p-5">
+  <section class="container-fluid mt-1 p-5 responsive-section">
 
-    <div class="d-flex justify-content-end mb-3">
-      <button type="button" class="button-danger" (click)="regresar()">
-        Regresar
-      </button>
+    <div class="hero-header mb-3">
+      <div class="hero-header__background"></div>
+      <div class="hero-header__content">
+        <div class="hero-header__left">
+          <div class="hero-header__badge">
+            <mat-icon>analytics</mat-icon>
+            <span>Análisis en Tiempo Real</span>
+          </div>
+          <h1 class="hero-header__title">Análisis de Incidencias</h1>
+        </div>
+        <div class="hero-header__right">
+          <button type="button" class="hero-header__back-btn" (click)="regresar()">
+            <mat-icon>arrow_back</mat-icon>
+            <span>Regresar</span>
+          </button>
+        </div>
+      </div>
+      <div class="hero-header__accent"></div>
     </div>
-    <div class="panel p-3 mb-3 d-flex align-items-center justify-content-between border-start border-5 rounded"
+
+    <div class="panel p-3 mb-3 mt-5 d-flex align-items-center justify-content-between border-start border-5 rounded"
       [class.highlight-hombre]="highlightActive && colorEstado === 'hombre'"
       [class.highlight-mujer]="highlightActive && colorEstado === 'mujer'">
       <div class="d-flex align-items-center gap-3">
@@ -15,7 +30,7 @@
           style="width:56px;height:56px">
           <mat-icon class="fs-3 avatar-icon">directions_walk</mat-icon>
         </div>
-
+        <!--No eliminar este componente -->
         <div>
           <h3 class="title m-0 text-white">Hit Actual</h3>
 
@@ -198,33 +213,34 @@
       </div>
     </div>
 
-    <div class="row g-3 mt-4 align-items-end justify-content-end mb-3">
-      <div class="col-auto">
-        <label class="form-label mb-1">Fecha Inicio:</label>
-        <dx-date-box [(value)]="fechaInicio" type="date" displayFormat="dd-MMM-yyyy">
-        </dx-date-box>
-      </div>
-
-      <div class="col-auto">
-        <label class="form-label mb-1">Fecha Fin:</label>
-        <dx-date-box [(value)]="fechaFin" type="date" displayFormat="dd-MMM-yyyy">
-        </dx-date-box>
-      </div>
-
-      <div class="col-auto">
-        <button class="btn btn-primary" (click)="consultar()">
-          Consultar
-        </button>
-      </div>
-    </div>
+    
 
     <div class="row g-3 mt-3">
       <div class="col-12">
         <div class="box p-3">
-          <div class="title mb-2">Registro de Incidencias</div>
+          <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-3">
+            <div class="title mb-0">Registro de Incidencias</div>
+            <div class="d-flex align-items-end gap-2 flex-wrap">
+              <div>
+                <label class="form-label mb-1 small">Fecha Inicio:</label>
+                <dx-date-box [(value)]="fechaInicio" type="date" displayFormat="dd-MMM-yyyy"></dx-date-box>
+              </div>
+              <div>
+                <label class="form-label mb-1 small">Fecha Fin:</label>
+                <dx-date-box [(value)]="fechaFin" type="date" displayFormat="dd-MMM-yyyy"></dx-date-box>
+              </div>
+              <div>
+                <button class="btn btn-primary d-flex align-items-center gap-2" (click)="consultar()">
+                  <mat-icon>search</mat-icon>
+                  <span>Consultar</span>
+                </button>
+              </div>
+            </div>
+          </div>
 
           <dx-data-grid [dataSource]="registros" [columnHidingEnabled]="true" [showBorders]="true"
-            [showColumnLines]="true" [showRowLines]="true" [rowAlternationEnabled]="true" [height]="500">
+            [showColumnLines]="true" [showRowLines]="true" [rowAlternationEnabled]="true" [height]="500" 
+            [width]="'100%'">
             <dxo-group-panel [visible]="true"
               [emptyPanelText]="'Arrastre un encabezado de columna aquí para agrupar por esa columna'"></dxo-group-panel>
 

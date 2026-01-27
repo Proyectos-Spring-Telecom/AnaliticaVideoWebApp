@@ -15,8 +15,10 @@
   </header>
   <div class="surface">
     <div class="d-flex flex-wrap gap-10 justify-content-end w-100">
-      <button (click)="agregarPermiso()" mat-flat-button class="bg-secondary">
-        <i class="fa fa-plus"></i> Agregar</button>
+      <div *appHasPermission="'13'">
+        <button (click)="agregarPermiso()" mat-flat-button class="bg-secondary">
+          <i class="fa fa-plus"></i> Agregar</button>
+      </div>
       <button (click)="limpiarCampos()" mat-flat-button class="bg-success"><i class="fa fa-eraser"></i> Limpiar</button>
       <button (click)="toggleExpandGroups()" mat-flat-button class="bg-warn">
         <i [class]="autoExpandAllGroups ? 'fa fa-expand' : 'fa fa-compress'" aria-hidden="true"></i>
@@ -42,12 +44,14 @@
           </dxi-item>
           <dxi-item name="searchPanel" location="after"></dxi-item>
         </dxo-toolbar>
-        <dxo-pager [showPageSizeSelector]="true" [allowedPageSizes]="[20]" [showInfo]="true"></dxo-pager>
+        <dxo-pager [showPageSizeSelector]="true" [allowedPageSizes]="[100]" [showInfo]="true"></dxo-pager>
         <dxo-group-panel [emptyPanelText]="mensajeAgrupar" [visible]="true"></dxo-group-panel>
         <dxo-filter-row [visible]="showFilterRow"></dxo-filter-row>
+        
         <dxo-grouping #expand [autoExpandAll]="autoExpandAllGroups"></dxo-grouping>
         <dxo-header-filter [visible]="showHeaderFilter"></dxo-header-filter>
-        <dxi-column caption="Acciones" cellTemplate="acciones" alignment="center" [width]="150"></dxi-column>
+        <dxi-column caption="Acciones" cellTemplate="acciones" alignment="center" *appHasPermission="['14', '16']" [width]="150"></dxi-column>
+        <dxi-column dataField="id" caption="id" alignment="center" dataType="string" [allowSearch]="true"></dxi-column>
         <dxi-column dataField="nombre" caption="Nombre" alignment="center" dataType="string" [allowSearch]="true"></dxi-column>
         <dxi-column dataField="descripcion" caption="Descripción" alignment="center" dataType="string" [allowSearch]="true"></dxi-column>
         <dxi-column dataField="idModulo2.nombre" caption="Módulo" alignment="center" dataType="string" [allowSearch]="true">
@@ -63,12 +67,12 @@
           </div>
         </dxi-column>
         <div *dxTemplate="let row of 'acciones'" class="d-flex gap-3 justify-content-center">
-          <div>
+          <div *appHasPermission="'14'">
             <button valueExpr="id" id="actualizarButton" class="btnAcciones" (click)="actualizarPermiso(row.data.id)">
               <i class="fa fa-edit"></i>
             </button>
           </div>
-          <div>
+          <div *appHasPermission="'16'">
             @if (row.data.estatus === 0) {
             <button id="pinButton" class="btnAcciones" (click)="activar(row.data)">
               <i class="fa fa-arrow-up"></i>

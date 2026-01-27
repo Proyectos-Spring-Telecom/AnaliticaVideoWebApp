@@ -3,6 +3,7 @@ import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { routeAnimation } from 'src/app/pipe/module-open.animation';
+import { AuthenticationService } from 'src/app/services/auth.service';
 import { InstalacionCentral } from 'src/app/services/moduleService/instalacionesCentral.service';
 
 declare const google: any;
@@ -22,6 +23,9 @@ export class MonitoreoComponent implements OnInit, AfterViewInit, OnDestroy {
   viewMode: ViewMode = 'centrales';
   selectedCentral: any | null = null;
 
+  /** Solo rol 1 ve la lista de Clientes; el resto solo sus Instalaciones. */
+  isRol1 = false;
+
   private map?: any;
   private markers: any[] = [];
   private infoWindow?: any;
@@ -35,8 +39,8 @@ export class MonitoreoComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly apiKey = 'AIzaSyDuJ3IBZIs2mRbR4alTg7OZIsk0sXEJHhg';
 
   private readonly MAP_ID?: string = undefined;
-  private readonly PIN_URL = 'assets/images/logos/marker_spring.webp';
-  private readonly CENTRAL_PIN_URL = 'assets/images/logos/marker_blue.webp';
+  private readonly PIN_URL = 'assets/images/logos/markerInstalacion.png';
+  private readonly CENTRAL_PIN_URL = 'assets/images/logos/markerCliente.png';
 
   get listaVisible(): any[] {
     if (this.viewMode === 'centrales') {
@@ -49,10 +53,18 @@ export class MonitoreoComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(
     private insService: InstalacionCentral,
     private router: Router,
-    private toastr: ToastrService
-  ) { }
+    private toastr: ToastrService,
+    private auth: AuthenticationService
+  ) {}
+
+  private checkRol(): void {
+    const u = this.auth.getUser();
+    const rol = u?.rol != null ? Number(u.rol) : null;
+    this.isRol1 = rol === 1;
+  }
 
   ngOnInit(): void {
+    this.checkRol();
     this.obtenerInstalacionesCentral();
   }
 
@@ -68,19 +80,34 @@ export class MonitoreoComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  private pinIcon(url: string, size = 100): any {
+  private pinIcon(url: string, width: number, height: number) {
     return {
       url,
-      scaledSize: new google.maps.Size(size, size),
-      anchor: new google.maps.Point(size / 2, size - 8),
+      scaledSize: new google.maps.Size(width, height),
+      origin: new google.maps.Point(0, 0),
+      anchor: new google.maps.Point(width / 2, height)
     };
   }
 
   obtenerInstalacionesCentral() {
     this.insService.obtenerInstalacionCentral().subscribe((response: any) => {
-      this.listaInstalaciones = response?.data ?? [];
-      this.viewMode = 'centrales';
-      this.selectedCentral = null;
+      let data: any[] = response?.data ?? [];
+      const u = this.auth.getUser();
+      const idCliente = u?.idCliente != null ? u.idCliente : null;
+
+      if (this.isRol1) {
+        this.listaInstalaciones = data;
+        this.viewMode = 'centrales';
+        this.selectedCentral = null;
+      } else {
+        const filtered = data.filter(
+          (c: any) => c?.idCliente == idCliente || c?.id == idCliente
+        );
+        this.listaInstalaciones = filtered;
+        this.selectedCentral = filtered.length ? filtered[0] : null;
+        this.viewMode = 'instalaciones';
+      }
+
       if (this.map) this.renderAccordingMode();
     });
   }
@@ -158,7 +185,7 @@ export class MonitoreoComponent implements OnInit, AfterViewInit, OnDestroy {
         map: this.map,
         position: pos,
         title: c.nombreCliente || 'Central',
-        icon: this.pinIcon(this.CENTRAL_PIN_URL, 80),
+        icon: this.pinIcon(this.CENTRAL_PIN_URL, 40, 60),
       });
 
       marker.addListener('mouseover', () =>
@@ -199,7 +226,7 @@ export class MonitoreoComponent implements OnInit, AfterViewInit, OnDestroy {
         title: c?.nombreCliente
           ? `${c.nombreCliente} - Instalación`
           : 'Instalación',
-        icon: this.pinIcon(this.PIN_URL, 80),
+        icon: this.pinIcon(this.PIN_URL, 40, 60),
       });
 
       marker.addListener('mouseover', () =>
