@@ -187,4 +187,16 @@ export class AuthenticationService extends BaseServicesService {
       { responseType: 'text' as 'json' }
     );
   }
+
+  /**
+   * Restablecer contraseña con el token recibido por correo (enlace).
+   * El token suele llegar por query: /cambio-password?token=...
+   */
+  cambiarPasswordConToken(token: string, nuevaPassword: string): Observable<any> {
+    return this.http.post<any>(
+      environment.API_SECURITY + '/login/restablecer-password',
+      { token, nuevaPassword },
+      { responseType: 'json' }
+    );
+  }
 }

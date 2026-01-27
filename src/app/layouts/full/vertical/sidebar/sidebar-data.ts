@@ -188,12 +188,11 @@ export const navItems: NavItem[] = [
   {
     navCap: 'Ajustes',
   },
-  //{
-  //  displayName: 'Perfil Usuario',
-  //  iconName: 'user',
-    // route: '/permisos',
-    // Sin permiso requerido - siempre visible
-  //},
+  {
+    displayName: 'Perfil Usuario',
+    iconName: 'user',
+    route: '/usuarios/perfil-usuario',
+  },
   {
     displayName: 'Cerrar Sesión',
     iconName: 'lock',
