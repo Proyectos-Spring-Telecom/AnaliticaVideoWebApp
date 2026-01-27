@@ -80,7 +80,8 @@ export class ListaRolesComponent implements OnInit {
       cancelButtonColor: '#d33',
       confirmButtonText: 'Confirmar',
       cancelButtonText: 'Cancelar',
-      background: '#002136',
+      background: '#141a21',
+        color: '#ffffff',
     }).then((result) => {
       if (result.value) {
         this.rolService.updateEstatus(rowData.id, 1).subscribe(
@@ -89,7 +90,8 @@ export class ListaRolesComponent implements OnInit {
               title: '¡Confirmación Realizada!',
               html: `El rol ha sido activado.`,
               icon: 'success',
-              background: '#002136',
+              background: '#141a21',
+        color: '#ffffff',
               confirmButtonColor: '#3085d6',
               confirmButtonText: 'Confirmar',
             });
@@ -103,7 +105,8 @@ export class ListaRolesComponent implements OnInit {
               title: '¡Ops!',
               html: `${error}`,
               icon: 'error',
-              background: '#002136',
+              background: '#141a21',
+        color: '#ffffff',
               confirmButtonColor: '#3085d6',
               confirmButtonText: 'Confirmar',
             });
@@ -123,7 +126,8 @@ export class ListaRolesComponent implements OnInit {
       cancelButtonColor: '#d33',
       confirmButtonText: 'Confirmar',
       cancelButtonText: 'Cancelar',
-      background: '#002136',
+      background: '#141a21',
+        color: '#ffffff',
     }).then((result) => {
       if (result.value) {
         this.rolService.updateEstatus(rowData.id, 0).subscribe(
@@ -132,7 +136,8 @@ export class ListaRolesComponent implements OnInit {
               title: '¡Confirmación Realizada!',
               html: `El rol ha sido desactivado.`,
               icon: 'success',
-              background: '#002136',
+              background: '#141a21',
+        color: '#ffffff',
               confirmButtonColor: '#3085d6',
               confirmButtonText: 'Confirmar',
             });
@@ -145,7 +150,8 @@ export class ListaRolesComponent implements OnInit {
               title: '¡Ops!',
               html: `${error}`,
               icon: 'error',
-              background: '#002136',
+              background: '#141a21',
+        color: '#ffffff',
               confirmButtonColor: '#3085d6',
               confirmButtonText: 'Confirmar',
             });
@@ -294,6 +300,8 @@ export class ListaRolesComponent implements OnInit {
         .filter(col => (col.groupIndex ?? -1) >= 0);
       if (groupedColumns.length === 0) {
         Swal.fire({
+          background: '#141a21',
+          color: '#ffffff',
           title: '¡Ops!',
           text: 'Debes arrastar un encabezado de una columna para expandir o contraer grupos.',
           icon: 'warning',

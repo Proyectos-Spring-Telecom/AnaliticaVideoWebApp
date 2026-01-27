@@ -8,6 +8,7 @@ import { MaterialModule } from 'src/app/material.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ListaModelosComponent } from './lista-modelos/lista-modelos.component';
 import { AgregarModeloComponent } from './agregar-modelo/agregar-modelo.component';
+import { HasPermissionDirective } from 'src/app/core/haspermission.directive';
 
 
 @NgModule({
@@ -23,7 +24,8 @@ import { AgregarModeloComponent } from './agregar-modelo/agregar-modelo.componen
     DxButtonModule,
     MaterialModule,
     ReactiveFormsModule,
-    FormsModule
+    FormsModule,
+    HasPermissionDirective
   ]
 })
 export class ModelosModule { }

@@ -14,9 +14,13 @@ export class UsuariosService {
     return this.http.get<any>(`${environment.API_SECURITY}/usuarios/list`);
   }
 
-  obtenerUsuariosData(page: number, pageSize: number): Observable<any> {
-		return this.http.get(`${environment.API_SECURITY}/usuarios/${page}/${pageSize}`);
-	}
+  obtenerUsuariosData(page: number, limit: number): Observable<any> {
+    const pageNum = Number(page) || 1;
+    const limitNum = Number(limit) || 10;
+    return this.http.get(
+      `${environment.API_SECURITY}/usuarios/${pageNum}/${limitNum}`
+    );
+  }
 
   obtenerUsuariosRolOperador(): Observable <any>{
     return this.http.get<any>(`${environment.API_SECURITY}/usuarios/list/rol/operador`)
@@ -63,16 +67,33 @@ export class UsuariosService {
     );
   }
 
-
-cambioContrasena(data: any, token: string) {
-  const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-  return this.http.post(
-    environment.API_SECURITY + '/login/cambiar/accesso',
-    data,
-    {
-      headers,
-      responseType: 'text' as const   // <- igual que el otro: texto plano
+  /**
+   * PATCH /login/cambiar/accesso — restablecer contraseña desde enlace (token en URL).
+   * Body: { userName, password }. Si se pasa token, se envía Authorization: Bearer <token>.
+   */
+  cambiarAccesso(userName: string, password: string, token?: string | null): Observable<any> {
+    const options: { headers?: HttpHeaders; responseType: 'text' } = {
+      responseType: 'text' as const,
+    };
+    if (token && typeof token === 'string' && token.trim().length > 0) {
+      options.headers = new HttpHeaders().set('Authorization', `Bearer ${token.trim()}`);
     }
-  );
-}
+    return this.http.patch(
+      environment.API_SECURITY + '/login/cambiar/accesso',
+      { userName, password },
+      options
+    );
+  }
+
+  cambioContrasena(data: any, token: string) {
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.post(
+      environment.API_SECURITY + '/login/cambiar/accesso',
+      data,
+      {
+        headers,
+        responseType: 'text' as const
+      }
+    );
+  }
 }

@@ -12,4 +12,5 @@ export interface NavItem {
     route?: string;
     children?: NavItem[];
     ddType?: string;
+    permission?: number | number[]; // Permiso(s) requerido(s) para ver este elemento
 }

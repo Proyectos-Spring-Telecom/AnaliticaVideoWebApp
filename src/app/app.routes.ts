@@ -89,6 +89,26 @@ export const routes: Routes = [
         loadChildren: () =>
           import('./pages/equipos/equipos.module').then((m) => m.EquiposModule),
       },
+      {
+        path: 'departamentos',
+        loadChildren: () =>
+          import('./pages/departamentos/departamentos.module').then((m) => m.DepartamentosModule),
+      },
+      {
+        path: 'monitoreo',
+        loadChildren: () =>
+          import('./pages/monitoreo/monitoreo.module').then((m) => m.MonitoreoModule),
+      },
+      {
+        path: 'instalaciones-centrales',
+        loadChildren: () =>
+          import('./pages/instalaciones-centrales/instalaciones-centrales.module').then((m) => m.InstalacionesCentralesModule),
+      },
+      {
+        path: 'instalaciones',
+        loadChildren: () =>
+          import('./pages/instalaciones/instalaciones.module').then((m) => m.InstalacionesModule),
+      },
     ],
   },
 

@@ -32,7 +32,7 @@ export class AgregarClienteComponent implements OnInit {
     private activatedRouted: ActivatedRoute,
     private route: Router,
     private usuaService: UsuariosService,
-    private users: AuthenticationService,
+    private users: AuthenticationService
   ) {
     const user = this.users.getUser();
   }
@@ -59,52 +59,54 @@ export class AgregarClienteComponent implements OnInit {
   }
 
   obtenerClienteID() {
-    this.clieService.obtenerCliente(this.idCliente).subscribe((response: any) => {
-      const d = response?.data ?? {};
+    this.clieService
+      .obtenerCliente(this.idCliente)
+      .subscribe((response: any) => {
+        const d = response?.data ?? {};
 
-      this.clienteForm.patchValue({
-        idPadre: Number(d.idPadre ?? 0),
-        rfc: d.rfc ?? '',
-        tipoPersona: d.tipoPersona ?? null,
-        estatus: d.estatus ?? 1,
-        logotipo: d.logotipo ?? null,
-        nombre: d.nombre ?? '',
-        apellidoPaterno: d.apellidoPaterno ?? null,
-        apellidoMaterno: d.apellidoMaterno ?? null,
-        telefono: d.telefono ?? '',
-        correo: d.correo ?? '',
-        estado: d.estado ?? '',
-        municipio: d.municipio ?? '',
-        colonia: d.colonia ?? '',
-        calle: d.calle ?? '',
-        entreCalles: d.entreCalles ?? '',
-        numeroExterior: d.numeroExterior ?? '',
-        numeroInterior: d.numeroInterior ?? '',
-        cp: d.cp ?? '',
-        nombreEncargado: d.nombreEncargado ?? '',
-        telefonoEncargado: d.telefonoEncargado ?? '',
-        correoEncargado: d.correoEncargado ?? '',
-        sitioWeb: d.sitioWeb ?? '',
-        constanciaSituacionFiscal: d.constanciaSituacionFiscal ?? null,
-        comprobanteDomicilio: d.comprobanteDomicilio ?? null,
-        actaConstitutiva: d.actaConstitutiva ?? null,
+        this.clienteForm.patchValue({
+          idPadre: Number(d.idPadre ?? 0),
+          rfc: d.rfc ?? '',
+          tipoPersona: d.tipoPersona ?? null,
+          estatus: d.estatus ?? 1,
+          logotipo: d.logotipo ?? null,
+          nombre: d.nombre ?? '',
+          apellidoPaterno: d.apellidoPaterno ?? null,
+          apellidoMaterno: d.apellidoMaterno ?? null,
+          telefono: d.telefono ?? '',
+          correo: d.correo ?? '',
+          estado: d.estado ?? '',
+          municipio: d.municipio ?? '',
+          colonia: d.colonia ?? '',
+          calle: d.calle ?? '',
+          entreCalles: d.entreCalles ?? '',
+          numeroExterior: d.numeroExterior ?? '',
+          numeroInterior: d.numeroInterior ?? '',
+          cp: d.cp ?? '',
+          nombreEncargado: d.nombreEncargado ?? '',
+          telefonoEncargado: d.telefonoEncargado ?? '',
+          correoEncargado: d.correoEncargado ?? '',
+          sitioWeb: d.sitioWeb ?? '',
+          constanciaSituacionFiscal: d.constanciaSituacionFiscal ?? null,
+          comprobanteDomicilio: d.comprobanteDomicilio ?? null,
+          actaConstitutiva: d.actaConstitutiva ?? null,
+        });
+        this.originalDocs = {
+          logotipo: d.logotipo ?? '',
+          constanciaSituacionFiscal: d.constanciaSituacionFiscal ?? '',
+          comprobanteDomicilio: d.comprobanteDomicilio ?? '',
+          actaConstitutiva: d.actaConstitutiva ?? '',
+        };
       });
-      this.originalDocs = {
-        logotipo: d.logotipo ?? '',
-        constanciaSituacionFiscal: d.constanciaSituacionFiscal ?? '',
-        comprobanteDomicilio: d.comprobanteDomicilio ?? '',
-        actaConstitutiva: d.actaConstitutiva ?? '',
-      };
-    });
   }
 
   onFileSelected(event: any) {
     const file = event.target.files[0];
     if (file) {
       this.selectedFileName = file.name;
-      this.clienteForm.patchValue({ Logotipo: file });
-      this.clienteForm.get('Logotipo')?.markAsTouched();
-      this.clienteForm.get('Logotipo')?.updateValueAndValidity();
+      this.clienteForm.patchValue({ logotipo: file });
+      this.clienteForm.get('logotipo')?.markAsTouched();
+      this.clienteForm.get('logotipo')?.updateValueAndValidity();
 
       const reader = new FileReader();
       reader.onload = () => {
@@ -142,7 +144,7 @@ export class AgregarClienteComponent implements OnInit {
     const sanitizedValue = inputElement.value.replace(/[^A-Za-z0-9]/g, '');
     inputElement.value = sanitizedValue.slice(0, 13);
     this.clienteForm
-      .get('RFC')
+      .get('rfc')
       ?.setValue(inputElement.value, { emitEvent: false });
   }
 
@@ -158,7 +160,7 @@ export class AgregarClienteComponent implements OnInit {
 
   initForm() {
     this.clienteForm = this.fb.group({
-      idPadre: [null],
+      idPadre: [null, Validators.required],
       rfc: ['', Validators.required],
       tipoPersona: [null, Validators.required],
       estatus: [1, Validators.required],
@@ -175,14 +177,14 @@ export class AgregarClienteComponent implements OnInit {
       municipio: ['', Validators.required],
       colonia: ['', Validators.required],
       calle: ['', Validators.required],
-      entreCalles: ['', Validators.required],
+      entreCalles: [null],
       numeroExterior: ['', Validators.required],
       numeroInterior: [null],
       cp: ['', Validators.required],
       nombreEncargado: ['', Validators.required],
       telefonoEncargado: ['', Validators.required],
       correoEncargado: ['', [Validators.required, Validators.email]],
-      sitioWeb: [null,],
+      sitioWeb: [null],
     });
   }
 
@@ -228,6 +230,7 @@ export class AgregarClienteComponent implements OnInit {
       this.loading = false;
 
       const etiquetas: any = {
+        idPadre: 'Cliente',
         rfc: 'RFC',
         tipoPersona: 'Tipo de Persona',
         estatus: 'Estatus',
@@ -244,14 +247,11 @@ export class AgregarClienteComponent implements OnInit {
         municipio: 'Municipio',
         colonia: 'Colonia',
         calle: 'Calle',
-        entreCalles: 'Entre Calles',
         numeroExterior: 'Número Exterior',
-        numeroInterior: 'Número Interior',
         cp: 'Código Postal',
         nombreEncargado: 'Nombre del Encargado',
         telefonoEncargado: 'Teléfono del Encargado',
         correoEncargado: 'Email del Encargado',
-        sitioWeb: 'Sitio Web',
       };
 
       const camposFaltantes: string[] = [];
@@ -273,6 +273,8 @@ export class AgregarClienteComponent implements OnInit {
         .join('');
 
       Swal.fire({
+        color: '#ffffff',
+        background: '#141a21',
         title: '¡Faltan campos obligatorios!',
         html: `
         <p style="text-align:center;font-size:15px;margin-bottom:16px;color:white">
@@ -287,18 +289,71 @@ export class AgregarClienteComponent implements OnInit {
       });
       return;
     }
+
     if (this.clienteForm.contains('id')) this.clienteForm.removeControl('id');
     const v = this.clienteForm.value;
-    const payload = {
-      ...v,
-      tipoPersona: v.tipoPersona != null ? Number(v.tipoPersona) : null,
-    };
+    v.tipoPersona = v.tipoPersona != null ? Number(v.tipoPersona) : null;
 
-    this.clieService.agregarCliente(payload).subscribe(
+    const formData = new FormData();
+
+    if (v.idPadre !== undefined && v.idPadre !== null) {
+      formData.append('idPadre', String(v.idPadre));
+    }
+    if (v.rfc != null) formData.append('rfc', v.rfc);
+    if (v.tipoPersona != null)
+      formData.append('tipoPersona', String(v.tipoPersona));
+    if (v.estatus != null) formData.append('estatus', String(v.estatus));
+
+    if (v.nombre != null) formData.append('nombre', v.nombre);
+    if (v.apellidoPaterno != null)
+      formData.append('apellidoPaterno', v.apellidoPaterno);
+    if (v.apellidoMaterno != null)
+      formData.append('apellidoMaterno', v.apellidoMaterno);
+    if (v.telefono != null) formData.append('telefono', v.telefono);
+    if (v.correo != null) formData.append('correo', v.correo);
+    if (v.estado != null) formData.append('estado', v.estado);
+    if (v.municipio != null) formData.append('municipio', v.municipio);
+    if (v.colonia != null) formData.append('colonia', v.colonia);
+    if (v.calle != null) formData.append('calle', v.calle);
+    if (v.entreCalles != null) formData.append('entreCalles', v.entreCalles);
+    if (v.numeroExterior != null)
+      formData.append('numeroExterior', v.numeroExterior);
+    if (v.numeroInterior != null)
+      formData.append('numeroInterior', v.numeroInterior);
+    if (v.cp != null) formData.append('cp', v.cp);
+    if (v.nombreEncargado != null)
+      formData.append('nombreEncargado', v.nombreEncargado);
+    if (v.telefonoEncargado != null)
+      formData.append('telefonoEncargado', v.telefonoEncargado);
+    if (v.correoEncargado != null)
+      formData.append('correoEncargado', v.correoEncargado);
+    if (v.sitioWeb != null) formData.append('sitioWeb', v.sitioWeb);
+
+    const logotipo = v.logotipo;
+    const csf = v.constanciaSituacionFiscal;
+    const comp = v.comprobanteDomicilio;
+    const acta = v.actaConstitutiva;
+
+    if (logotipo instanceof File) {
+      formData.append('logotipo', logotipo, logotipo.name);
+    }
+    if (csf instanceof File) {
+      formData.append('constanciaSituacionFiscal', csf, csf.name);
+    }
+    if (comp instanceof File) {
+      formData.append('comprobanteDomicilio', comp, comp.name);
+    }
+    if (acta instanceof File) {
+      formData.append('actaConstitutiva', acta, acta.name);
+    }
+
+    this.clieService.agregarCliente(formData).subscribe(
       () => {
         this.submitButton = 'Guardar';
         this.loading = false;
         Swal.fire({
+          color: '#ffffff',
+          background: '#141a21',
           title: '¡Operación Exitosa!',
           text: 'Se agregó un nuevo cliente de manera exitosa.',
           icon: 'success',
@@ -307,12 +362,14 @@ export class AgregarClienteComponent implements OnInit {
         });
         this.regresar();
       },
-      () => {
+      (error) => {
         this.submitButton = 'Guardar';
         this.loading = false;
         Swal.fire({
+          color: '#ffffff',
+          background: '#141a21',
           title: '¡Ops!',
-          text: 'Ocurrió un error al agregar el cliente.',
+          text: error?.error?.message,
           icon: 'error',
           confirmButtonColor: '#3085d6',
           confirmButtonText: 'Confirmar',
@@ -327,21 +384,33 @@ export class AgregarClienteComponent implements OnInit {
 
     const tipo = Number(this.clienteForm.get('tipoPersona')?.value ?? null);
     if (tipo === 1) {
-      this.clienteForm.get('apellidoPaterno')?.setValidators([Validators.required]);
-      this.clienteForm.get('apellidoMaterno')?.setValidators([Validators.required]);
+      this.clienteForm
+        .get('apellidoPaterno')
+        ?.setValidators([Validators.required]);
+      this.clienteForm
+        .get('apellidoMaterno')
+        ?.setValidators([Validators.required]);
     } else if (tipo === 2) {
       this.clienteForm.get('apellidoPaterno')?.clearValidators();
       this.clienteForm.get('apellidoMaterno')?.clearValidators();
-      this.clienteForm.patchValue({ apellidoPaterno: null, apellidoMaterno: null });
+      this.clienteForm.patchValue({
+        apellidoPaterno: null,
+        apellidoMaterno: null,
+      });
     }
-    this.clienteForm.get('apellidoPaterno')?.updateValueAndValidity({ emitEvent: false });
-    this.clienteForm.get('apellidoMaterno')?.updateValueAndValidity({ emitEvent: false });
+    this.clienteForm
+      .get('apellidoPaterno')
+      ?.updateValueAndValidity({ emitEvent: false });
+    this.clienteForm
+      .get('apellidoMaterno')
+      ?.updateValueAndValidity({ emitEvent: false });
 
     if (this.clienteForm.invalid) {
       this.submitButton = 'Actualizar';
       this.loading = false;
 
       const etiquetas: any = {
+        idPadre: 'Cliente',
         rfc: 'RFC',
         tipoPersona: 'Tipo de Persona',
         estatus: 'Estatus',
@@ -358,14 +427,11 @@ export class AgregarClienteComponent implements OnInit {
         municipio: 'Municipio',
         colonia: 'Colonia',
         calle: 'Calle',
-        entreCalles: 'Entre Calles',
         numeroExterior: 'Número Exterior',
-        numeroInterior: 'Número Interior',
         cp: 'Código Postal',
         nombreEncargado: 'Nombre del Encargado',
         telefonoEncargado: 'Teléfono del Encargado',
         correoEncargado: 'Email del Encargado',
-        sitioWeb: 'Sitio Web',
       };
 
       const camposFaltantes: string[] = [];
@@ -386,6 +452,8 @@ export class AgregarClienteComponent implements OnInit {
         .join('');
 
       Swal.fire({
+        color: '#ffffff',
+        background: '#141a21',
         title: '¡Faltan campos obligatorios!',
         html: `
         <p style="text-align:center;font-size:15px;margin-bottom:16px;color:white">
@@ -402,65 +470,90 @@ export class AgregarClienteComponent implements OnInit {
     }
 
     const v = this.clienteForm.value;
+    v.tipoPersona = v.tipoPersona != null ? Number(v.tipoPersona) : null;
 
-    const urls$ = forkJoin({
-      logotipo: this.resolveUrlForField('logotipo', v.logotipo),
-      constanciaSituacionFiscal: this.resolveUrlForField('constanciaSituacionFiscal', v.constanciaSituacionFiscal),
-      comprobanteDomicilio: this.resolveUrlForField('comprobanteDomicilio', v.comprobanteDomicilio),
-      actaConstitutiva: this.resolveUrlForField('actaConstitutiva', v.actaConstitutiva),
-    });
+    const formData = new FormData();
 
-    urls$
-      .pipe(finalize(() => { }))
-      .subscribe({
-        next: (u: any) => {
-          const payload = {
-            ...v,
-            tipoPersona: v.tipoPersona != null ? Number(v.tipoPersona) : null,
-            logotipo: u.logotipo,
-            constanciaSituacionFiscal: u.constanciaSituacionFiscal,
-            comprobanteDomicilio: u.comprobanteDomicilio,
-            actaConstitutiva: u.actaConstitutiva,
-          };
+    if (v.idPadre !== undefined && v.idPadre !== null) {
+      formData.append('idPadre', String(v.idPadre));
+    }
+    if (v.rfc != null) formData.append('rfc', v.rfc);
+    if (v.tipoPersona != null)
+      formData.append('tipoPersona', String(v.tipoPersona));
+    if (v.estatus != null) formData.append('estatus', String(v.estatus));
 
-          this.clieService.actualizarCliente(this.idCliente, payload).subscribe(
-            () => {
-              this.submitButton = 'Actualizar';
-              this.loading = false;
-              Swal.fire({
-                title: '¡Operación Exitosa!',
-                text: 'Los datos del cliente se actualizaron correctamente.',
-                icon: 'success',
-                confirmButtonColor: '#3085d6',
-                confirmButtonText: 'Confirmar',
-              });
-              this.regresar();
-            },
-            () => {
-              this.submitButton = 'Actualizar';
-              this.loading = false;
-              Swal.fire({
-                title: '¡Ops!',
-                text: 'Ocurrió un error al actualizar el cliente.',
-                icon: 'error',
-                confirmButtonColor: '#3085d6',
-                confirmButtonText: 'Confirmar',
-              });
-            }
-          );
-        },
-        error: () => {
-          this.submitButton = 'Actualizar';
-          this.loading = false;
-          Swal.fire({
-            title: '¡Ops!',
-            text: 'No fue posible preparar los documentos para actualizar.',
-            icon: 'error',
-            confirmButtonColor: '#3085d6',
-            confirmButtonText: 'Confirmar',
-          });
-        },
-      });
+    if (v.nombre != null) formData.append('nombre', v.nombre);
+    if (v.apellidoPaterno != null)
+      formData.append('apellidoPaterno', v.apellidoPaterno);
+    if (v.apellidoMaterno != null)
+      formData.append('apellidoMaterno', v.apellidoMaterno);
+    if (v.telefono != null) formData.append('telefono', v.telefono);
+    if (v.correo != null) formData.append('correo', v.correo);
+    if (v.estado != null) formData.append('estado', v.estado);
+    if (v.municipio != null) formData.append('municipio', v.municipio);
+    if (v.colonia != null) formData.append('colonia', v.colonia);
+    if (v.calle != null) formData.append('calle', v.calle);
+    if (v.entreCalles != null) formData.append('entreCalles', v.entreCalles);
+    if (v.numeroExterior != null)
+      formData.append('numeroExterior', v.numeroExterior);
+    if (v.numeroInterior != null)
+      formData.append('numeroInterior', v.numeroInterior);
+    if (v.cp != null) formData.append('cp', v.cp);
+    if (v.nombreEncargado != null)
+      formData.append('nombreEncargado', v.nombreEncargado);
+    if (v.telefonoEncargado != null)
+      formData.append('telefonoEncargado', v.telefonoEncargado);
+    if (v.correoEncargado != null)
+      formData.append('correoEncargado', v.correoEncargado);
+    if (v.sitioWeb != null) formData.append('sitioWeb', v.sitioWeb);
+
+    const logotipo = v.logotipo;
+    const csf = v.constanciaSituacionFiscal;
+    const comp = v.comprobanteDomicilio;
+    const acta = v.actaConstitutiva;
+
+    if (logotipo instanceof File) {
+      formData.append('logotipo', logotipo, logotipo.name);
+    }
+    if (csf instanceof File) {
+      formData.append('constanciaSituacionFiscal', csf, csf.name);
+    }
+    if (comp instanceof File) {
+      formData.append('comprobanteDomicilio', comp, comp.name);
+    }
+    if (acta instanceof File) {
+      formData.append('actaConstitutiva', acta, acta.name);
+    }
+
+    this.clieService.actualizarCliente(this.idCliente, formData).subscribe(
+      () => {
+        this.submitButton = 'Actualizar';
+        this.loading = false;
+        Swal.fire({
+          color: '#ffffff',
+          background: '#141a21',
+          title: '¡Operación Exitosa!',
+          text: 'Los datos del cliente se actualizaron correctamente.',
+          icon: 'success',
+          confirmButtonColor: '#3085d6',
+          confirmButtonText: 'Confirmar',
+        });
+        this.regresar();
+      },
+      () => {
+        this.submitButton = 'Actualizar';
+        this.loading = false;
+        Swal.fire({
+          color: '#ffffff',
+          background: '#141a21',
+          title: '¡Ops!',
+          text: 'Ocurrió un error al actualizar el cliente.',
+          icon: 'error',
+          confirmButtonColor: '#3085d6',
+          confirmButtonText: 'Confirmar',
+        });
+      }
+    );
   }
 
   regresar() {
@@ -480,7 +573,8 @@ export class AgregarClienteComponent implements OnInit {
 
   @ViewChild('logoFileInput') logoFileInput!: ElementRef<HTMLInputElement>;
   @ViewChild('csfFileInput') csfFileInput!: ElementRef<HTMLInputElement>;
-  @ViewChild('compDomFileInput') compDomFileInput!: ElementRef<HTMLInputElement>;
+  @ViewChild('compDomFileInput')
+  compDomFileInput!: ElementRef<HTMLInputElement>;
   @ViewChild('actaFileInput') actaFileInput!: ElementRef<HTMLInputElement>;
 
   logoPreviewUrl: string | ArrayBuffer | null = null;
@@ -521,18 +615,26 @@ export class AgregarClienteComponent implements OnInit {
     return /\.(png|jpe?g|webp|gif|bmp|svg|avif)(\?.*)?$/i.test(u);
   }
 
+  private isLogoImage(file: File): boolean {
+    if (!file?.type) return /\.(png|jpe?g)$/i.test(file.name);
+    return /^image\/(png|jpe?g)$/i.test(file.type);
+  }
+
   private isAllowedLogo(file: File): boolean {
-    const okType = this.isImage(file) || this.isPdf(file) || this.isOffice(file);
+    const okType = this.isLogoImage(file);
     const okSize = file.size <= this.MAX_MB * 1024 * 1024;
     return okType && okSize;
   }
   private isAllowedDoc(file: File): boolean {
-    const okType = this.isPdf(file);
+    const okType = this.isImage(file) || this.isPdf(file);
     const okSize = file.size <= this.MAX_MB * 1024 * 1024;
     return okType && okSize;
   }
 
-  private loadPreview(file: File, setter: (url: string | ArrayBuffer | null) => void) {
+  private loadPreview(
+    file: File,
+    setter: (url: string | ArrayBuffer | null) => void
+  ) {
     if (!this.isImage(file)) {
       setter(null);
       return;
@@ -553,18 +655,83 @@ export class AgregarClienteComponent implements OnInit {
     e.preventDefault();
     this.logoDragging = false;
   }
-  onLogoDrop(e: DragEvent) {
-    e.preventDefault();
-    this.logoDragging = false;
-    const f = e.dataTransfer?.files?.[0] || null;
-    if (f) this.handleLogoFile(f);
-  }
+
+
   onLogoFileSelected(e: Event) {
     const input = e.target as HTMLInputElement;
     const f = input.files?.[0] || null;
     if (f) this.handleLogoFile(f);
     if (input) input.value = '';
   }
+
+  onLogoDrop(e: DragEvent) {
+    e.preventDefault();
+    this.logoDragging = false;
+    const f = e.dataTransfer?.files?.[0] || null;
+    if (f) this.handleLogoFile(f);
+  }
+
+  private handleLogoFile(file: File) {
+    if (!this.isAllowedLogo(file)) {
+      this.clienteForm.get('logotipo')?.setErrors({ invalid: true });
+      if (!this.isLogoImage(file)) {
+        Swal.fire({
+          color: '#ffffff',
+          background: '#141a21',
+          icon: 'warning',
+          title: 'Formato no permitido',
+          text: 'El logotipo solo acepta PNG, JPG o JPEG.'
+        });
+      }
+      return;
+    }
+
+    this.validateLogoDimensions(file, 799, 286).then(isValid => {
+      if (!isValid) {
+        this.logoPreviewUrl = null;
+        this.clienteForm.patchValue({ logotipo: null });
+        this.clienteForm.get('logotipo')?.setErrors({ invalidDimensions: true });
+
+        Swal.fire({
+          color: '#ffffff',
+        background: '#141a21',
+          icon: 'warning',
+          title: '¡Dimensiones Inválidas!',
+          text: 'El logotipo debe medir exactamente 799 x 286 px.'
+        });
+
+        return;
+      }
+
+      this.loadPreview(file, (url) => (this.logoPreviewUrl = url));
+      this.clienteForm.patchValue({ logotipo: file });
+      this.clienteForm.get('logotipo')?.setErrors(null);
+    });
+  }
+
+  private validateLogoDimensions(file: File, width: number, height: number): Promise<boolean> {
+    return new Promise(resolve => {
+      const img = new Image();
+      const objectUrl = URL.createObjectURL(file);
+
+      img.onload = () => {
+        const isValid = img.width === width && img.height === height;
+        URL.revokeObjectURL(objectUrl);
+        resolve(isValid);
+      };
+
+      img.onerror = () => {
+        URL.revokeObjectURL(objectUrl);
+        resolve(false);
+      };
+
+      img.src = objectUrl;
+    });
+  }
+
+
+
+
   clearLogoImage(e: Event) {
     e.stopPropagation();
     this.logoPreviewUrl = null;
@@ -572,16 +739,7 @@ export class AgregarClienteComponent implements OnInit {
     this.clienteForm.patchValue({ logotipo: this.DEFAULT_AVATAR_URL });
     this.clienteForm.get('logotipo')?.setErrors(null);
   }
-  private handleLogoFile(file: File) {
-    if (!this.isAllowedLogo(file)) {
-      this.clienteForm.get('logotipo')?.setErrors({ invalid: true });
-      return;
-    }
-    this.loadPreview(file, (url) => (this.logoPreviewUrl = url));
-    this.clienteForm.patchValue({ logotipo: file });
-    this.clienteForm.get('logotipo')?.setErrors(null);
-    this.uploadLogo(file);
-  }
+
   private uploadingLogo = false;
   private uploadLogo(file: File): void {
     if (this.uploadingLogo) return;
@@ -592,8 +750,13 @@ export class AgregarClienteComponent implements OnInit {
     fd.append('folder', 'clientes');
     fd.append('idModule', '1');
 
-    this.usuaService.uploadFile(fd)
-      .pipe(finalize(() => { this.uploadingLogo = false; }))
+    this.usuaService
+      .uploadFile(fd)
+      .pipe(
+        finalize(() => {
+          this.uploadingLogo = false;
+        })
+      )
       .subscribe({
         next: (res: any) => {
           const url = this.extractFileUrl(res);
@@ -638,19 +801,22 @@ export class AgregarClienteComponent implements OnInit {
     this.csfPreviewUrl = null;
     this.csfFileName = null;
     this.csfFileInput.nativeElement.value = '';
-    this.clienteForm.patchValue({ constanciaSituacionFiscal: this.DEFAULT_AVATAR_URL });
+    this.clienteForm.patchValue({
+      constanciaSituacionFiscal: this.DEFAULT_AVATAR_URL,
+    });
     this.clienteForm.get('constanciaSituacionFiscal')?.setErrors(null);
   }
   private handleCsfFile(file: File) {
     if (!this.isAllowedDoc(file)) {
-      this.clienteForm.get('constanciaSituacionFiscal')?.setErrors({ invalid: true });
+      this.clienteForm
+        .get('constanciaSituacionFiscal')
+        ?.setErrors({ invalid: true });
       return;
     }
     this.csfFileName = file.name;
     this.loadPreview(file, (url) => (this.csfPreviewUrl = url));
     this.clienteForm.patchValue({ constanciaSituacionFiscal: file });
     this.clienteForm.get('constanciaSituacionFiscal')?.setErrors(null);
-    this.uploadCsf(file);
   }
   private uploadingCsf = false;
   private uploadCsf(file: File): void {
@@ -662,8 +828,13 @@ export class AgregarClienteComponent implements OnInit {
     fd.append('folder', 'clientes');
     fd.append('idModule', '1');
 
-    this.usuaService.uploadFile(fd)
-      .pipe(finalize(() => { this.uploadingCsf = false; }))
+    this.usuaService
+      .uploadFile(fd)
+      .pipe(
+        finalize(() => {
+          this.uploadingCsf = false;
+        })
+      )
       .subscribe({
         next: (res: any) => {
           const url = this.extractFileUrl(res);
@@ -671,11 +842,15 @@ export class AgregarClienteComponent implements OnInit {
             this.clienteForm.patchValue({ constanciaSituacionFiscal: url });
             this.csfPreviewUrl = this.isImageUrl(url) ? url : null;
           } else {
-            this.clienteForm.get('constanciaSituacionFiscal')?.setErrors({ uploadFailed: true });
+            this.clienteForm
+              .get('constanciaSituacionFiscal')
+              ?.setErrors({ uploadFailed: true });
           }
         },
         error: () => {
-          this.clienteForm.get('constanciaSituacionFiscal')?.setErrors({ uploadFailed: true });
+          this.clienteForm
+            .get('constanciaSituacionFiscal')
+            ?.setErrors({ uploadFailed: true });
         },
       });
   }
@@ -708,19 +883,22 @@ export class AgregarClienteComponent implements OnInit {
     this.compDomPreviewUrl = null;
     this.compDomFileName = null;
     this.compDomFileInput.nativeElement.value = '';
-    this.clienteForm.patchValue({ comprobanteDomicilio: this.DEFAULT_AVATAR_URL });
+    this.clienteForm.patchValue({
+      comprobanteDomicilio: this.DEFAULT_AVATAR_URL,
+    });
     this.clienteForm.get('comprobanteDomicilio')?.setErrors(null);
   }
   private handleCompDomFile(file: File) {
     if (!this.isAllowedDoc(file)) {
-      this.clienteForm.get('comprobanteDomicilio')?.setErrors({ invalid: true });
+      this.clienteForm
+        .get('comprobanteDomicilio')
+        ?.setErrors({ invalid: true });
       return;
     }
     this.compDomFileName = file.name;
     this.loadPreview(file, (url) => (this.compDomPreviewUrl = url));
     this.clienteForm.patchValue({ comprobanteDomicilio: file });
     this.clienteForm.get('comprobanteDomicilio')?.setErrors(null);
-    this.uploadCompDom(file);
   }
   private uploadingComp = false;
   private uploadCompDom(file: File): void {
@@ -732,8 +910,13 @@ export class AgregarClienteComponent implements OnInit {
     fd.append('folder', 'clientes');
     fd.append('idModule', '1');
 
-    this.usuaService.uploadFile(fd)
-      .pipe(finalize(() => { this.uploadingComp = false; }))
+    this.usuaService
+      .uploadFile(fd)
+      .pipe(
+        finalize(() => {
+          this.uploadingComp = false;
+        })
+      )
       .subscribe({
         next: (res: any) => {
           const url = this.extractFileUrl(res);
@@ -741,11 +924,15 @@ export class AgregarClienteComponent implements OnInit {
             this.clienteForm.patchValue({ comprobanteDomicilio: url });
             this.compDomPreviewUrl = this.isImageUrl(url) ? url : null;
           } else {
-            this.clienteForm.get('comprobanteDomicilio')?.setErrors({ uploadFailed: true });
+            this.clienteForm
+              .get('comprobanteDomicilio')
+              ?.setErrors({ uploadFailed: true });
           }
         },
         error: () => {
-          this.clienteForm.get('comprobanteDomicilio')?.setErrors({ uploadFailed: true });
+          this.clienteForm
+            .get('comprobanteDomicilio')
+            ?.setErrors({ uploadFailed: true });
         },
       });
   }
@@ -790,7 +977,6 @@ export class AgregarClienteComponent implements OnInit {
     this.loadPreview(file, (url) => (this.actaPreviewUrl = url));
     this.clienteForm.patchValue({ actaConstitutiva: file });
     this.clienteForm.get('actaConstitutiva')?.setErrors(null);
-    this.uploadActa(file);
   }
   private uploadingActa = false;
   private uploadActa(file: File): void {
@@ -802,8 +988,13 @@ export class AgregarClienteComponent implements OnInit {
     fd.append('folder', 'clientes');
     fd.append('idModule', '1');
 
-    this.usuaService.uploadFile(fd)
-      .pipe(finalize(() => { this.uploadingActa = false; }))
+    this.usuaService
+      .uploadFile(fd)
+      .pipe(
+        finalize(() => {
+          this.uploadingActa = false;
+        })
+      )
       .subscribe({
         next: (res: any) => {
           const url = this.extractFileUrl(res);
@@ -811,11 +1002,15 @@ export class AgregarClienteComponent implements OnInit {
             this.clienteForm.patchValue({ actaConstitutiva: url });
             this.actaPreviewUrl = this.isImageUrl(url) ? url : null;
           } else {
-            this.clienteForm.get('actaConstitutiva')?.setErrors({ uploadFailed: true });
+            this.clienteForm
+              .get('actaConstitutiva')
+              ?.setErrors({ uploadFailed: true });
           }
         },
         error: () => {
-          this.clienteForm.get('actaConstitutiva')?.setErrors({ uploadFailed: true });
+          this.clienteForm
+            .get('actaConstitutiva')
+            ?.setErrors({ uploadFailed: true });
         },
       });
   }
@@ -841,8 +1036,11 @@ export class AgregarClienteComponent implements OnInit {
     fd.append('idModule', '1');
     return fd;
   }
-  
-  private resolveUrlForField(field: keyof typeof this.originalDocs, value: any) {
+
+  private resolveUrlForField(
+    field: keyof typeof this.originalDocs,
+    value: any
+  ) {
     if (this.isFileLike(value)) {
       return this.usuaService.uploadFile(this.buildFD(value)).pipe(
         map((r: any) => this.extractFileUrl(r) || ''),
@@ -852,5 +1050,4 @@ export class AgregarClienteComponent implements OnInit {
     if (typeof value === 'string' && value.trim()) return of(value.trim());
     return of(this.originalDocs[field] || '');
   }
-
 }

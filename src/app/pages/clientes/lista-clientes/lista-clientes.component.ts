@@ -16,38 +16,42 @@ import Swal from 'sweetalert2';
   animations: [routeAnimation],
 })
 export class ListaClientesComponent implements OnInit {
-
   isLoading: boolean = false;
   listaClientes: any;
   public grid: boolean = false;
   public showFilterRow: boolean;
   public showHeaderFilter: boolean;
   public loadingVisible: boolean = false;
-  public mensajeAgrupar: string = "Arrastre un encabezado de columna aquí para agrupar por esa columna";
+  public mensajeAgrupar: string =
+    'Arrastre un encabezado de columna aquí para agrupar por esa columna';
   public loading: boolean;
   public loadingMessage: string = 'Cargando...';
   public paginaActual: number = 1;
   public totalRegistros: number = 0;
   public pageSize: number = 20;
   public totalPaginas: number = 0;
-  @ViewChild(DxDataGridComponent, { static: false }) dataGrid: DxDataGridComponent;
+  @ViewChild(DxDataGridComponent, { static: false })
+  dataGrid: DxDataGridComponent;
   public autoExpandAllGroups: boolean = true;
   isGrouped: boolean = false;
   public paginaActualData: any[] = [];
   public filtroActivo: string = '';
 
-  constructor(private cliService: ClientesService,
-    private route: Router, private sanitizer: DomSanitizer,) {
+  constructor(
+    private cliService: ClientesService,
+    private route: Router,
+    private sanitizer: DomSanitizer
+  ) {
     this.showFilterRow = true;
     this.showHeaderFilter = true;
   }
 
   ngOnInit(): void {
-    this.setupDataSource()
+    this.setupDataSource();
   }
 
   agregarCliente() {
-    this.route.navigateByUrl('/clientes/agregar-cliente')
+    this.route.navigateByUrl('/clientes/agregar-cliente');
   }
 
   // hasPermission(permission: string): boolean {
@@ -72,52 +76,66 @@ export class ListaClientesComponent implements OnInit {
 
           const totalRegistros = Number(response?.paginated?.total) || 0;
           const paginaActual = Number(response?.paginated?.page) || page;
-          const totalPaginas = Number(response?.paginated?.limit) ||
+          const totalPaginas =
+            Number(response?.paginated?.limit) ||
             (take > 0 ? Math.ceil(totalRegistros / take) : 0);
 
           this.totalRegistros = totalRegistros;
           this.paginaActual = paginaActual;
           this.totalPaginas = totalPaginas;
 
-          const dataTransformada = (Array.isArray(response?.data) ? response.data : []).map((item: any) => {
-            const nombre = item?.nombre || '';
-            const paterno = item?.apellidoPaterno || '';
-            const materno = item?.apellidoMaterno || '';
-            const direccionCompleta = [
-              item?.calle ? `Calle ${item.calle}` : '',
-              item?.numeroExterior ? `#${item.numeroExterior}` : '',
-              item?.numeroInterior ? `Int. ${item.numeroInterior}` : '',
-              item?.colonia || '',
-              item?.municipio || '',
-              item?.estado || '',
-              item?.cp ? `CP ${item.cp}` : '',
-              item?.entreCalles ? `(Entre calles: ${item.entreCalles})` : ''
-            ].filter(Boolean).join(', ');
+          const dataTransformada = (
+            Array.isArray(response?.data) ? response.data : []
+          )
+            .map((item: any) => {
+              const nombre = item?.nombre || '';
+              const paterno = item?.apellidoPaterno || '';
+              const materno = item?.apellidoMaterno || '';
+              const direccionCompleta = [
+                item?.calle ? `Calle ${item.calle}` : '',
+                item?.numeroExterior ? `#${item.numeroExterior}` : '',
+                item?.numeroInterior ? `Int. ${item.numeroInterior}` : '',
+                item?.colonia || '',
+                item?.municipio || '',
+                item?.estado || '',
+                item?.cp ? `CP ${item.cp}` : '',
+                item?.entreCalles ? `(Entre calles: ${item.entreCalles})` : '',
+              ]
+                .filter(Boolean)
+                .join(', ');
 
-            return {
-              ...item,
-              id: Number(item?.id),
-              tipoPersona: item?.tipoPersona == 1 ? 'Físico' : item?.tipoPersona == 2 ? 'Moral' : 'Desconocido',
-              idRol: item?.idRol != null ? Number(item.idRol) : null,
-              idCliente: item?.idCliente != null ? Number(item.idCliente) : null,
-              NombreCompleto: [nombre, paterno, materno].filter(Boolean).join(' '),
-              direccionCompleta
-            };
-          }).sort((a: any, b: any) => Number(b.id) - Number(a.id));
+              return {
+                ...item,
+                id: Number(item?.id),
+                tipoPersona:
+                  item?.tipoPersona == 1
+                    ? 'Físico'
+                    : item?.tipoPersona == 2
+                    ? 'Moral'
+                    : 'Desconocido',
+                idRol: item?.idRol != null ? Number(item.idRol) : null,
+                idCliente:
+                  item?.idCliente != null ? Number(item.idCliente) : null,
+                NombreCompleto: [nombre, paterno, materno]
+                  .filter(Boolean)
+                  .join(' '),
+                direccionCompleta,
+              };
+            })
+            .sort((a: any, b: any) => Number(b.id) - Number(a.id));
 
           this.paginaActualData = dataTransformada;
 
           return {
             data: dataTransformada,
-            totalCount: totalRegistros
+            totalCount: totalRegistros,
           };
-
         } catch (error) {
           this.loading = false;
           console.error('Error en la solicitud de datos:', error);
           return { data: [], totalCount: 0 };
         }
-      }
+      },
     });
   }
 
@@ -145,27 +163,34 @@ export class ListaClientesComponent implements OnInit {
     try {
       const colsOpt = grid?.option('columns');
       if (Array.isArray(colsOpt) && colsOpt.length) columnas = colsOpt;
-    } catch { }
-    if (!columnas.length && grid?.getVisibleColumns) columnas = grid.getVisibleColumns();
+    } catch {}
+    if (!columnas.length && grid?.getVisibleColumns)
+      columnas = grid.getVisibleColumns();
 
     const dataFields: string[] = columnas
       .map((c: any) => c?.dataField)
       .filter((df: any) => typeof df === 'string' && df.trim().length > 0);
 
     const getByPath = (obj: any, path: string) =>
-      !obj || !path ? undefined : path.split('.').reduce((acc, k) => acc?.[k], obj);
+      !obj || !path
+        ? undefined
+        : path.split('.').reduce((acc, k) => acc?.[k], obj);
 
     let qStatusNum: number | null = null;
     if (q === '1' || q === 'activo') qStatusNum = 1;
     else if (q === '0' || q === 'inactivo') qStatusNum = 0;
 
     const dataFiltrada = (this.paginaActualData || []).filter((row: any) => {
-      const hitCols = dataFields.some((df) => norm(getByPath(row, df)).includes(q));
+      const hitCols = dataFields.some((df) =>
+        norm(getByPath(row, df)).includes(q)
+      );
 
       const estNum = Number(row?.estatus);
       const estHit =
         Number.isFinite(estNum) &&
-        (qStatusNum !== null ? estNum === qStatusNum : String(estNum).toLowerCase().includes(q));
+        (qStatusNum !== null
+          ? estNum === qStatusNum
+          : String(estNum).toLowerCase().includes(q));
 
       const hitExtras = [
         norm(row?.id),
@@ -177,7 +202,7 @@ export class ListaClientesComponent implements OnInit {
         norm(row?.nombreEncargado),
         norm(row?.telefonoEncargado),
         norm(row?.correoEncargado),
-        norm(row?.direccionCompleta)
+        norm(row?.direccionCompleta),
       ].some((s) => s.includes(q));
 
       return hitCols || estHit || hitExtras;
@@ -185,7 +210,6 @@ export class ListaClientesComponent implements OnInit {
 
     grid?.option('dataSource', dataFiltrada);
   }
-
 
   onPageIndexChanged(e: any) {
     const pageIndex = e.component.pageIndex();
@@ -195,13 +219,15 @@ export class ListaClientesComponent implements OnInit {
 
   actualizarCliente(idCliente: number) {
     this.route.navigateByUrl('/clientes/editar-cliente/' + idCliente);
-  };
+  }
 
   eliminarCliente(cliente: any) {
     Swal.fire({
       title: '¡Eliminar Cliente!',
       html: `Está seguro que requiere eliminar el cliente: <br> ${cliente.NombreCompleto}?`,
       icon: 'warning',
+      background: '#141a21',
+        color: '#ffffff',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33',
@@ -212,22 +238,25 @@ export class ListaClientesComponent implements OnInit {
         this.cliService.eliminarCliente(cliente.Id).subscribe(
           (response) => {
             Swal.fire({
+              background: '#141a21',
+        color: '#ffffff',
               title: '¡Eliminado!',
               html: `El cliente ha sido eliminado de forma exitosa.`,
               icon: 'success',
               showCancelButton: false,
               confirmButtonColor: '#3085d6',
               confirmButtonText: 'Confirmar',
-            })
+            });
             this.setupDataSource();
           },
           (error) => {
             Swal.fire({
+              background: '#141a21',
               title: '¡Ops!',
               html: `Error al intentar eliminar el cliente.`,
               icon: 'error',
               showCancelButton: false,
-            })
+            });
           }
         );
       }
@@ -237,6 +266,8 @@ export class ListaClientesComponent implements OnInit {
   activar(rowData: any) {
     Swal.fire({
       title: '¡Activar!',
+      background: '#141a21',
+      color: '#ffffff',
       html: `¿Está seguro que requiere activar el cliente: <strong>${rowData.nombre}</strong>?`,
       icon: 'warning',
       showCancelButton: true,
@@ -249,12 +280,14 @@ export class ListaClientesComponent implements OnInit {
         this.cliService.updateEstatus(rowData.id, 1).subscribe(
           (response) => {
             Swal.fire({
+              background: '#141a21',
+        color: '#ffffff',
               title: '¡Confirmación Realizada!',
               html: `El cliente ha sido activado.`,
               icon: 'success',
               confirmButtonColor: '#3085d6',
               confirmButtonText: 'Confirmar',
-            })
+            });
 
             this.setupDataSource();
             this.dataGrid.instance.refresh();
@@ -263,11 +296,13 @@ export class ListaClientesComponent implements OnInit {
           (error) => {
             Swal.fire({
               title: '¡Ops!',
+              background: '#141a21',
+        color: '#ffffff',
               html: `${error}`,
               icon: 'error',
               confirmButtonColor: '#3085d6',
               confirmButtonText: 'Confirmar',
-            })
+            });
           }
         );
       }
@@ -280,6 +315,8 @@ export class ListaClientesComponent implements OnInit {
       html: `¿Está seguro que requiere desactivar el cliente: <strong>${rowData.nombre}</strong>?`,
       icon: 'warning',
       showCancelButton: true,
+      background: '#141a21',
+        color: '#ffffff',
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33',
       confirmButtonText: 'Confirmar',
@@ -289,12 +326,14 @@ export class ListaClientesComponent implements OnInit {
         this.cliService.updateEstatus(rowData.id, 0).subscribe(
           (response) => {
             Swal.fire({
+              background: '#141a21',
+        color: '#ffffff',
               title: '¡Confirmación Realizada!',
               html: `El cliente ha sido desactivado.`,
               icon: 'success',
               confirmButtonColor: '#3085d6',
               confirmButtonText: 'Confirmar',
-            })
+            });
             this.setupDataSource();
             this.dataGrid.instance.refresh();
             // this.obtenerListaModulos();
@@ -304,9 +343,11 @@ export class ListaClientesComponent implements OnInit {
               title: '¡Ops!',
               html: `${error}`,
               icon: 'error',
+              background: '#141a21',
+        color: '#ffffff',
               confirmButtonColor: '#3085d6',
               confirmButtonText: 'Confirmar',
-            })
+            });
           }
         );
       }
@@ -323,54 +364,6 @@ export class ListaClientesComponent implements OnInit {
   pdfLoaded = false;
   pdfError = false;
   pdfErrorMsg = '';
-  async previsualizar(url?: string, titulo?: string, _row?: any) {
-    this.pdfTitle = titulo || 'Documento';
-    this.pdfRawUrl = (url || '').trim() || null;
-    this.pdfUrlSafe = null;
-    this.pdfLoading = true;
-    this.pdfLoaded = false;
-    this.pdfError = false;
-    this.pdfErrorMsg = '';
-    this.pdfPopupVisible = true;
-    this.pdfPopupWidth = Math.min(Math.floor(window.innerWidth * 0.95), 900);
-    if (!this.pdfRawUrl) {
-      this.pdfError = true;
-      this.pdfLoading = false;
-      this.pdfErrorMsg = 'Este registro no tiene un PDF asignado.';
-      return;
-    }
-    try {
-      const head = await fetch(this.pdfRawUrl, { method: 'HEAD', mode: 'cors' });
-      if (!head.ok) {
-        this.pdfError = true;
-        this.pdfErrorMsg = `No se pudo acceder al archivo (HTTP ${head.status}).`;
-        this.pdfLoading = false;
-        return;
-      }
-      const ct = head.headers.get('content-type') || '';
-      if (!ct.toLowerCase().includes('pdf')) {
-        this.pdfError = true;
-        this.pdfErrorMsg = 'El recurso no es un archivo PDF.';
-        this.pdfLoading = false;
-        return;
-      }
-    } catch (e) {
-      this.pdfError = true;
-      this.pdfErrorMsg = 'El navegador bloqueó la previsualización (CORS). Intenta Abrir o Descargar.';
-      this.pdfLoading = false;
-      return;
-    }
-    const viewerParams = '#toolbar=0&navpanes=0';
-    const finalUrl = this.pdfRawUrl.includes('#') ? this.pdfRawUrl : this.pdfRawUrl + viewerParams;
-    this.pdfUrlSafe = this.sanitizer.bypassSecurityTrustResourceUrl(finalUrl);
-    setTimeout(() => {
-      if (!this.pdfLoaded && !this.pdfError) {
-        this.pdfError = true;
-        this.pdfLoading = false;
-        this.pdfErrorMsg = 'El visor tardó demasiado en cargar.';
-      }
-    }, 4000);
-  }
 
   onPdfLoaded() {
     this.pdfLoaded = true;
@@ -390,7 +383,9 @@ export class ListaClientesComponent implements OnInit {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       const base = (this.pdfTitle || 'documento')
-        .toLowerCase().replace(/\s+/g, '_').replace(/[^\w\-]+/g, '');
+        .toLowerCase()
+        .replace(/\s+/g, '_')
+        .replace(/[^\w\-]+/g, '');
       a.href = url;
       a.download = base.endsWith('.pdf') ? base : base + '.pdf';
       document.body.appendChild(a);
@@ -400,7 +395,13 @@ export class ListaClientesComponent implements OnInit {
     } catch {
       try {
         const u = new URL(this.pdfRawUrl!);
-        u.searchParams.set('response-content-disposition', `attachment; filename="${(this.pdfTitle || 'documento').replace(/\s+/g, '_')}.pdf"`);
+        u.searchParams.set(
+          'response-content-disposition',
+          `attachment; filename="${(this.pdfTitle || 'documento').replace(
+            /\s+/g,
+            '_'
+          )}.pdf"`
+        );
         window.open(u.toString(), '_self');
       } catch {
         window.open(this.pdfRawUrl!, '_blank');
@@ -409,28 +410,57 @@ export class ListaClientesComponent implements OnInit {
   }
 
   toggleExpandGroups() {
-        const groupedColumns = this.dataGrid.instance.getVisibleColumns()
-          .filter(col => (col.groupIndex ?? -1) >= 0);
-        if (groupedColumns.length === 0) {
-          Swal.fire({
-            title: '¡Ops!',
-            text: 'Debes arrastar un encabezado de una columna para expandir o contraer grupos.',
-            icon: 'warning',
-            showCancelButton: false,
-            confirmButtonColor: '#3085d6',
-            confirmButtonText: 'Entendido',
-            allowOutsideClick: false,
-          });
-        } else {
-          this.autoExpandAllGroups = !this.autoExpandAllGroups;
-          this.dataGrid.instance.refresh();
-        }
-      }
-  
-    limpiarCampos() {
-      this.dataGrid.instance.clearGrouping();
-      this.dataGrid.instance.pageIndex(0);
+    const groupedColumns = this.dataGrid.instance
+      .getVisibleColumns()
+      .filter((col) => (col.groupIndex ?? -1) >= 0);
+    if (groupedColumns.length === 0) {
+      Swal.fire({
+        background: '#141a21',
+        color: '#ffffff',
+        title: '¡Ops!',
+        text: 'Debes arrastar un encabezado de una columna para expandir o contraer grupos.',
+        icon: 'warning',
+        showCancelButton: false,
+        confirmButtonColor: '#3085d6',
+        confirmButtonText: 'Entendido',
+        allowOutsideClick: false,
+      });
+    } else {
+      this.autoExpandAllGroups = !this.autoExpandAllGroups;
       this.dataGrid.instance.refresh();
-      this.isGrouped = false;
     }
+  }
+
+  limpiarCampos() {
+    this.dataGrid.instance.clearGrouping();
+    this.dataGrid.instance.pageIndex(0);
+    this.dataGrid.instance.refresh();
+    this.isGrouped = false;
+  }
+
+  mostrarModalDoc = false;
+  docTitulo = '';
+  docUrl = '';
+  docSafeUrl: SafeResourceUrl | null = null;
+  docCliente: any = null;
+
+  previsualizar(url: string, titulo: string, data: any): void {
+    if (!url) {
+      return;
+    }
+
+    this.docUrl = url;
+    this.docTitulo = titulo;
+    this.docCliente = data;
+    this.docSafeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+    this.mostrarModalDoc = true;
+  }
+
+  cerrarModalDoc(): void {
+    this.mostrarModalDoc = false;
+    this.docSafeUrl = null;
+    this.docUrl = '';
+    this.docTitulo = '';
+    this.docCliente = null;
+  }
 }

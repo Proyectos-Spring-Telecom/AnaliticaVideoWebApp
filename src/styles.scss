@@ -195,6 +195,70 @@ body {
 
 
 //Formulario
+
+/* Select con look de input (misma altura, radios, padding, bg y focus) */
+.perm-ig .form-floating select.form-control {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: calc(3.5rem + 2px);
+  padding: 1rem 3rem 1rem 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--mat-sys-outline-variant);
+  background-color: var(--app-surface-2, #1f2832);
+  color: var(--app-text, #e6e7ea);
+  line-height: 1.25;
+}
+
+.perm-ig .form-floating select.form-control:focus {
+  outline: none;
+  border-color: var(--mat-sys-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--mat-sys-primary) 25%, transparent);
+}
+
+.perm-ig .form-floating select.form-control:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+}
+
+/* Oculta la flecha nativa en navegadores legacy */
+.perm-ig .form-floating select.form-control::-ms-expand { display: none; }
+
+/* Caret custom para que luzca como input con ícono a la derecha */
+.perm-ig .form-floating {
+  position: relative;
+}
+
+.perm-ig .perm-select-floating::after {
+  content: '▾';
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  font-size: .9rem;
+  opacity: .7;
+}
+
+/* Alinea el label flotante del select igual que el del input */
+.perm-ig .form-floating select.form-control + label {
+  transform: scale(.85) translateY(-.6rem) translateX(.15rem);
+  opacity: .8;
+  background: transparent;
+  left: .85rem;
+}
+
+/* Igualar el “chip” de ícono a la izquierda entre ambos campos */
+.perm-ig .input-group-text {
+  min-width: 48px;
+  height: calc(3.5rem + 2px);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.75rem 0 0 0.75rem;
+}
+
 .perm-head__icon {
   position: relative;
   z-index: 1;
@@ -356,7 +420,7 @@ body {
   color: #ffffff;
 }
 .perm-form-nc .perm-ig select.form-select option:disabled {
-  color: #94a3b8;
+  color: #ffffff;
   background: #1c252e;
 }
 .perm-form-nc .perm-ig select.form-select optgroup {
@@ -554,6 +618,16 @@ body {
   border-color: #19348b;
 }
 
+#detalleIns {
+  background: linear-gradient(180deg, #681330 0%,#580f27 100%);
+  border-color: #681330;
+  color: #fff;
+}
+#detalleIns:hover {
+  background: linear-gradient(180deg, #580f27 0%, #580f27 100%);
+  border-color: #681330;
+}
+
 #pinButton {
   background: linear-gradient(180deg, #1f9e5a 0%, #166534 100%);
   border-color: #14532d;
@@ -609,3 +683,79 @@ body {
   color: #fee2e2;
 }
 .estatus-inactivo::before { background: #f87171; }
+
+.estatus-disponible {
+  background: #064e3b;
+  border-color: #022c22;
+  color: #bbf7d0;
+}
+.estatus-disponible::before {
+  background: #22c55e;
+}
+
+/* Instalado (azul) */
+.estatus-instalado {
+  background: #0f2942;
+  border-color: #0b1b2d;
+  color: #dbeafe;
+}
+.estatus-instalado::before {
+  background: #60a5fa;
+}
+
+/* En reparación (ámbar) */
+.estatus-reparacion {
+  background: #451a03;
+  border-color: #2c1202;
+  color: #ffedd5;
+}
+.estatus-reparacion::before {
+  background: #fb923c;
+}
+
+/* Descompuesto (rojo vino) */
+.estatus-descompuesto {
+  background: #4c0519;
+  border-color: #2b0410;
+  color: #fee2e2;
+}
+.estatus-descompuesto::before {
+  background: #f97373;
+}
+
+.uploader__filename--link {
+  display: block;
+  max-width: 100%;
+  padding: 0.45rem 0.9rem;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #2b3a55, #181f2a);
+  color: #f5f5ff;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-decoration: none;
+
+  /* que se vaya hacia abajo cuando es muy larga */
+  white-space: normal;
+  word-break: break-all;
+
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(120, 155, 255, 0.6);
+  transition:
+    transform 0.15s ease-out,
+    box-shadow 0.15s ease-out,
+    background 0.15s ease-out,
+    border-color 0.15s ease-out;
+}
+
+/* quitar el ícono del lado izquierdo si quedó de antes */
+.uploader__filename--link::before {
+  content: none;
+}
+
+.uploader__filename--link:hover {
+  transform: translateY(-1px) scale(1.01);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.45);
+  background: linear-gradient(135deg, #3a4f7a, #1c2433);
+  border-color: rgba(160, 190, 255, 0.95);
+  color: #ffffff;
+}

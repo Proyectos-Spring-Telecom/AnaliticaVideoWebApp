@@ -17,6 +17,8 @@ import { User } from 'src/app/entities/User';
 import { AuthenticationService } from 'src/app/services/auth.service';
 import { catchError, throwError } from 'rxjs';
 import Swal from 'sweetalert2';
+import { ToastrService } from 'ngx-toastr';
+import { Permiso } from 'src/app/entities/permiso.enum';
 
 @Component({
   selector: 'app-side-login',
@@ -25,14 +27,18 @@ import Swal from 'sweetalert2';
 })
 export class AppSideLoginComponent implements OnInit {
   options = this.settings.getOptions();
+  public isDisabled = false;
 
-  constructor(private router: Router,
+  constructor(
+    private router: Router,
     private settings: CoreService,
     private auth: AuthenticationService,
     private fb: FormBuilder,
     private cdr: ChangeDetectorRef,
     private route: ActivatedRoute,
-    private authService: AuthenticationService,) { }
+    private toastr: ToastrService,
+    private authService: AuthenticationService
+  ) {}
 
   form = new FormGroup({
     uname: new FormControl('', [Validators.required, Validators.minLength(6)]),
@@ -45,7 +51,7 @@ export class AppSideLoginComponent implements OnInit {
 
   submit() {
     // console.log(this.form.value);
-    this.router.navigate(['/dashboard']);
+    this.router.navigate(['/monitoreo']);
   }
 
   initForm() {
@@ -58,7 +64,7 @@ export class AppSideLoginComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.initForm()
+    this.initForm();
   }
 
   loginForm: UntypedFormGroup;
@@ -69,6 +75,7 @@ export class AppSideLoginComponent implements OnInit {
   public textLogin: string = 'Iniciar Sesión';
   public loading: boolean = false;
   onSubmit() {
+    this.isDisabled = true;
     this.loading = true;
     this.textLogin = 'Cargando...';
     window.scrollTo({
@@ -81,35 +88,28 @@ export class AppSideLoginComponent implements OnInit {
     this.auth
       .authenticate(this.credentials)
       .pipe(
-        catchError((error) => {
+        catchError((error: any) => {
           this.loading = false;
           this.textLogin = 'Iniciar Sesión';
-          Swal.fire({
-            icon: 'error',
-            title: '¡Ops!',
-            text: 'Ocurrió un error al procesar tu solicitud.',
-            confirmButtonText: 'Confirmar',
-            background: '#141a21',
-            color: '#ffffff',
-          });
-
+          // Obtener el mensaje del servidor desde error.error.message
+          const errorMessage = error?.error?.message || error?.message || 'Error al iniciar sesión';
+          this.toastr.error(errorMessage, '¡Ops!');
+          this.isDisabled = false;
           return throwError(() => '');
         })
       )
       .subscribe((result: User) => {
+        this.isDisabled = false;
         this.auth.setData(result);
 
-        this.router.navigate(['/dashboard']);
+        const perms = this.auth.getPermissions() || [];
+        const hasMonitoreo = perms.includes(String(Permiso.CONSULTAR_MONITOREO));
+        this.router.navigate(hasMonitoreo ? ['/monitoreo'] : ['/usuarios/perfil-usuario']);
 
-        Swal.fire({
-          icon: 'success',
-          title: '¡Operación Exitosa!',
-          text: 'Todo salió bien.',
-          confirmButtonText: 'Confirmar',
-          background: '#141a21',
-          color: '#ffffff',
-        });
-
+        this.toastr.success(
+          'Bienvenido al Sistema.',
+          '¡Credenciales Correctas!'
+        );
 
         this.loading = false;
         this.textLogin = 'Iniciar Sesión';
@@ -118,6 +118,17 @@ export class AppSideLoginComponent implements OnInit {
 
   onSubmits() {
     // console.log(this.form.value);
-    this.router.navigate(['/dashboard']);
+    this.router.navigate(['/monitoreo']);
+  }
+
+  openFacebook() {
+    window.open('https://www.facebook.com/profile.php?id=61579119466053', '_blank');
+  }
+
+  openInstagram() {
+    window.open(
+      'https://www.instagram.com/spring_telecom?fbclid=IwY2xjawPgd-ZleHRuA2FlbQIxMABicmlkETFWcXA1TlhHNEkza3VHQW16c3J0YwZhcHBfaWQQMjIyMDM5MTc4ODIwMDg5MgABHhKPqP9x7y6kKduncrL3ZWgMV5pl48pdF_VN8yg9so_O9zZdq0q1_G-wMD54_aem_lEOCii1Rjv-RdeLXoTG6rA',
+      '_blank'
+    );
   }
 }

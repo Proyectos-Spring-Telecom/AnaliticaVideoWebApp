@@ -24,10 +24,16 @@
                             <span class="input-group-text fw-bold">
                                 <mat-icon aria-hidden="true">account_tree</mat-icon>
                             </span>
-                            <div class="form-floating flex-grow-1">
-                                <input type="text" formControlName="idPadre" class="form-control" id="cuentaPadre"
-                                    placeholder="ID o nombre de cuenta padre">
-                                <label for="cuentaPadre">ID o nombre de cuenta padre</label>
+                            <div class="form-floating flex-grow-1 perm-select-floating">
+                                <select class="form-select" id="cuentaPadre" required formControlName="idPadre">
+                                    <!-- <option [ngValue]="null" disabled>Selecciona una cuenta padre </option> -->
+                                    <option *ngFor="let cliente of listaClientes" [ngValue]="cliente.id">
+                                        {{ cliente.nombre }}
+                                        {{ cliente.apellidoPaterno }}
+                                        {{ cliente.apellidoMaterno }}
+                                    </option>
+                                </select>
+                                <label for="cuentaPadre">Selecciona cuenta padre</label>
                             </div>
                         </div>
                     </div>
@@ -52,9 +58,9 @@
                             <span class="input-group-text fw-bold">
                                 <mat-icon aria-hidden="true">person</mat-icon>
                             </span>
-                            <div class="form-floating flex-grow-1">
+                            <div class="form-floating flex-grow-1 perm-select-floating">
                                 <select class="form-select" id="tipoPersona" formControlName="tipoPersona" required>
-                                    <option [ngValue]="null"></option>
+                                    <!-- <option [ngValue]="null"></option> -->
                                     <option [ngValue]="1">Física</option>
                                     <option [ngValue]="2">Moral</option>
                                 </select>
@@ -208,7 +214,7 @@
                             </span>
                             <div class="form-floating flex-grow-1">
                                 <input type="text" formControlName="entreCalles" class="form-control" id="entreCalles"
-                                    placeholder="Ej.: Xola y Eugenia" required>
+                                    placeholder="Ej.: Xola y Eugenia">
                                 <label for="entreCalles">Ej.: Xola y Eugenia</label>
                             </div>
                         </div>
@@ -312,10 +318,7 @@
                             </div>
                         </div>
                     </div>
-                    <!-- Row: Subida de archivos -->
                     <div class="row g-4 mt-3 uploader-wrap">
-
-                        <!-- Logotipo (imagen) -->
                         <div class="col-12 col-md-6 col-lg-3">
                             <label class="form-label perm-label d-block mb-2">Logotipo</label>
                             <div class="uploader-hero">
@@ -330,24 +333,29 @@
                                         <div class="uploader__cta">
                                             <button mat-flat-button color="primary" type="button"
                                                 (click)="openLogoFilePicker()">Seleccionar</button>
-                                            <span class="uploader__badge">PNG · JPG</span>
+                                            <span class="uploader__badge">PNG · JPG · JPEG</span>
                                         </div>
 
-                                        <div class="uploader__status"
-                                            *ngIf="logoPreviewUrl || clienteForm.get('logotipo')?.value">
-                                            <div class="uploader__filename" *ngIf="logoPreviewUrl">Imagen seleccionada
+                                        <div class="uploader__status" *ngIf="clienteForm.get('logotipo')?.value">
+                                            <div class="uploader__filename"
+                                                *ngIf="clienteForm.get('logotipo')?.value?.name">
+                                                {{ clienteForm.get('logotipo')?.value?.name }}
                                             </div>
-                                            <div class="uploader__ok">Imagen cargada correctamente.</div>
+                                            <a class="uploader__filename uploader__filename--link"
+                                                *ngIf="!clienteForm.get('logotipo')?.value?.name"
+                                                [href]="clienteForm.get('logotipo')?.value" target="_blank"
+                                                rel="noopener noreferrer">
+                                                {{ clienteForm.get('logotipo')?.value }}
+                                            </a>
                                         </div>
 
-                                        <input #logoFileInput type="file" accept="image/png,image/jpeg,image/webp"
+                                        <input #logoFileInput type="file" accept="image/png,image/jpeg,image/jpg"
                                             (change)="onLogoFileSelected($event)" class="uploader__input" />
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Constancia de Situación Fiscal (PDF) -->
                         <div class="col-12 col-md-6 col-lg-3">
                             <label class="form-label perm-label d-block mb-2">Constancia de Situación Fiscal</label>
                             <div class="uploader-hero">
@@ -366,8 +374,17 @@
 
                                         <div class="uploader__status"
                                             *ngIf="csfFileName || clienteForm.get('constanciaSituacionFiscal')?.value">
-                                            <div class="uploader__filename" *ngIf="csfFileName">{{ csfFileName }}</div>
-                                            <div class="uploader__ok">Archivo cargado correctamente.</div>
+                                            <div class="uploader__filename"
+                                                *ngIf="csfFileName || clienteForm.get('constanciaSituacionFiscal')?.value?.name">
+                                                {{ csfFileName
+                                                || clienteForm.get('constanciaSituacionFiscal')?.value?.name }}
+                                            </div>
+                                            <a class="uploader__filename uploader__filename--link"
+                                                *ngIf="!csfFileName && !clienteForm.get('constanciaSituacionFiscal')?.value?.name"
+                                                [href]="clienteForm.get('constanciaSituacionFiscal')?.value"
+                                                target="_blank" rel="noopener noreferrer">
+                                                {{ clienteForm.get('constanciaSituacionFiscal')?.value }}
+                                            </a>
                                         </div>
 
                                         <input #csfFileInput type="file" accept="application/pdf"
@@ -377,7 +394,6 @@
                             </div>
                         </div>
 
-                        <!-- Comprobante de Domicilio (PDF) -->
                         <div class="col-12 col-md-6 col-lg-3">
                             <label class="form-label perm-label d-block mb-2">Comprobante de Domicilio</label>
                             <div class="uploader-hero">
@@ -397,11 +413,18 @@
 
                                         <div class="uploader__status"
                                             *ngIf="compDomFileName || clienteForm.get('comprobanteDomicilio')?.value">
-                                            <div class="uploader__filename" *ngIf="compDomFileName">{{ compDomFileName
-                                                }}</div>
-                                            <div class="uploader__ok">Archivo cargado correctamente.</div>
+                                            <div class="uploader__filename"
+                                                *ngIf="compDomFileName || clienteForm.get('comprobanteDomicilio')?.value?.name">
+                                                {{ compDomFileName
+                                                || clienteForm.get('comprobanteDomicilio')?.value?.name }}
+                                            </div>
+                                            <a class="uploader__filename uploader__filename--link"
+                                                *ngIf="!compDomFileName && !clienteForm.get('comprobanteDomicilio')?.value?.name"
+                                                [href]="clienteForm.get('comprobanteDomicilio')?.value" target="_blank"
+                                                rel="noopener noreferrer">
+                                                {{ clienteForm.get('comprobanteDomicilio')?.value }}
+                                            </a>
                                         </div>
-
                                         <input #compDomFileInput type="file" accept="application/pdf"
                                             (change)="onCompDomFileSelected($event)" class="uploader__input" />
                                     </div>
@@ -409,7 +432,6 @@
                             </div>
                         </div>
 
-                        <!-- Acta Constitutiva (PDF) -->
                         <div class="col-12 col-md-6 col-lg-3">
                             <label class="form-label perm-label d-block mb-2">Acta Constitutiva</label>
                             <div class="uploader-hero">
@@ -429,9 +451,17 @@
 
                                         <div class="uploader__status"
                                             *ngIf="actaFileName || clienteForm.get('actaConstitutiva')?.value">
-                                            <div class="uploader__filename" *ngIf="actaFileName">{{ actaFileName }}
+                                            <div class="uploader__filename"
+                                                *ngIf="actaFileName || clienteForm.get('actaConstitutiva')?.value?.name">
+                                                {{ actaFileName
+                                                || clienteForm.get('actaConstitutiva')?.value?.name }}
                                             </div>
-                                            <div class="uploader__ok">Archivo cargado correctamente.</div>
+                                            <a class="uploader__filename uploader__filename--link"
+                                                *ngIf="!actaFileName && !clienteForm.get('actaConstitutiva')?.value?.name"
+                                                [href]="clienteForm.get('actaConstitutiva')?.value" target="_blank"
+                                                rel="noopener noreferrer">
+                                                {{ clienteForm.get('actaConstitutiva')?.value }}
+                                            </a>
                                         </div>
 
                                         <input #actaFileInput type="file" accept="application/pdf"
@@ -442,10 +472,7 @@
                         </div>
 
                     </div>
-
-
                 </div>
-
                 <div class="d-flex flex-wrap gap-3 justify-content-start mt-4">
                     <button class="button-success" role="button" (click)="submit()"><i
                             class="fa fa-check"></i>&nbsp;&nbsp;{{submitButton}}</button>

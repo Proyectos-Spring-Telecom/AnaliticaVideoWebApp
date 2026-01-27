@@ -74,7 +74,7 @@ export class ListaProductosComponent implements OnInit {
       cancelButtonText: 'Cancelar',
     }).then((result) => {
       if (result.value) {
-        this.producService.updateEstatus(rowData.id, 1).subscribe(
+        this.producService.updateEstatusActivar(rowData.id, 1).subscribe(
           (response) => {
             Swal.fire({
               background: '#141a21',
@@ -120,7 +120,7 @@ export class ListaProductosComponent implements OnInit {
       color: '#ffffff',
     }).then((result) => {
       if (result.value) {
-        this.producService.updateEstatus(rowData.id, 0).subscribe(
+        this.producService.updateEstatusDesactivar(rowData.id, 0).subscribe(
           (response) => {
             Swal.fire({
               title: '¡Confirmación Realizada!',
@@ -275,6 +275,8 @@ export class ListaProductosComponent implements OnInit {
       .filter((col) => (col.groupIndex ?? -1) >= 0);
     if (groupedColumns.length === 0) {
       Swal.fire({
+        background: '#141a21',
+        color: '#ffffff',
         title: '¡Ops!',
         text: 'Debes arrastar un encabezado de una columna para expandir o contraer grupos.',
         icon: 'warning',
