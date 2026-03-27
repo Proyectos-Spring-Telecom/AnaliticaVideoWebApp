@@ -3,7 +3,7 @@ import { CoreService } from 'src/app/services/core.service';
 import { MatDialog } from '@angular/material/dialog';
 import { navItems } from '../../vertical/sidebar/sidebar-data';
 import { TranslateService } from '@ngx-translate/core';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { TablerIconsModule } from 'angular-tabler-icons';
 import { MaterialModule } from 'src/app/material.module';
 import { BrandingComponent } from '../../vertical/sidebar/branding.component';
@@ -110,7 +110,8 @@ export class AppHorizontalHeaderComponent {
       private settings: CoreService,
       private vsidenav: CoreService,
       public dialog: MatDialog,
-      private translate: TranslateService
+      private translate: TranslateService,
+      private router: Router
     ) {
       translate.setDefaultLang('en');
     }
@@ -135,6 +136,26 @@ export class AppHorizontalHeaderComponent {
   
     private emitOptions() {
       this.optionsChange.emit(this.options);
+    }
+
+    handleLogin() {
+      // Limpiar cache del navegador
+      if ('caches' in window) {
+        caches.keys().then((cacheNames) => {
+          cacheNames.forEach((cacheName) => {
+            caches.delete(cacheName);
+          });
+        });
+      }
+
+      // Limpiar sessionStorage
+      sessionStorage.clear();
+
+      // Limpiar localStorage
+      localStorage.clear();
+
+      // Navegar a login
+      this.router.navigate(['/login']);
     }
 
   notifications: notifications[] = [
