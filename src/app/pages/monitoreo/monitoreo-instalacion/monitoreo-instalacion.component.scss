@@ -681,10 +681,15 @@
 .genero.hombre { background: #0ea5e9; } /* azul cielo hombres */
 .genero.mujer  { background: #f87171; } /* rosa coral mujeres */
 
-/* Estado de ánimo */
-.estado.feliz   { background: #22c55e; }  /* verde */
-.estado.neutral { background: #94a3b8; }  /* gris */
-.estado.triste  { background: #c0392b; }  /* rojo */
+/* Estado de ánimo (enum: feliz, neutral, sorprendido, triste, molesto, disgustado, asustado, despectivo) */
+.estado.feliz       { background: #22c55e; } /* verde */
+.estado.neutral     { background: #94a3b8; } /* gris */
+.estado.sorprendido { background: #eab308; } /* amarillo */
+.estado.triste      { background: #c0392b; } /* rojo */
+.estado.molesto     { background: #f97316; } /* naranja */
+.estado.disgustado  { background: #78716c; } /* piedra */
+.estado.asustado    { background: #a855f7; } /* violeta */
+.estado.despectivo  { background: #64748b; } /* gris azulado */
 
 
 

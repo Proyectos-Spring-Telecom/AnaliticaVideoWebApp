@@ -91,7 +91,7 @@ export class MonitoreoInstalacionComponent implements OnInit {
     private ngZone: NgZone,
     private route: ActivatedRoute,
     private router: Router
-  ) { }
+  ) { }  
 
   regresar(){
     window.history.back();
@@ -317,22 +317,14 @@ export class MonitoreoInstalacionComponent implements OnInit {
 
   private playNewHitSound(): void {
     try {
-      const a = new Audio('assets/images/notificacaion.mp3');
+      const a = new Audio('/assets/images/notificacaion.mp3');
       a.volume = 0.8;
       a.play().catch(() => { });
     } catch { }
   }
 
-  customizeEdadTooltip = (p: any) => ({
-    text: `${p.argumentText} Años:   ${p.valueText} Personas`,
-  });
-  customizeEdadMujeresTooltip = (p: any) => ({
-    text: `${p.argumentText}:   ${p.value} Mujeres`,
-  });
-  customizeEdadHombresTooltip = (p: any) => ({
-    text: `${p.argumentText}:   ${p.value} Hombres`,
-  });
 
+  /** Tooltip: Conteo de hits por hora (barras apiladas). */
   customizePoint = (p: any) => {
     if (p?.seriesName === 'Mujeres') return { color: '#f87171' };
     if (p?.seriesName === 'Hombres') return { color: '#0ea5e9' };
@@ -445,13 +437,28 @@ export class MonitoreoInstalacionComponent implements OnInit {
     const dd = Number(ddS);
     const mm = Number(mmS);
     const yyyy = Number(yyS);
-    const [hS, mS] = tpart.split(':');
+    const [hS, mS, sS] = tpart.split(':');
     if (!(dd && mm && yyyy)) return s;
     const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
     const hh = Number(hS || 0);
     const mi = Number(mS || 0);
+    const ss = Number(sS || 0);
     const pad2 = (n: number) => String(n).padStart(2, '0');
-    return `${pad2(dd)}-${meses[mm - 1]}-${yyyy} ${pad2(hh)}:${pad2(mi)}`;
+    return `${pad2(dd)}-${meses[mm - 1]}-${yyyy} ${pad2(hh)}:${pad2(mi)}:${pad2(ss)}`;
+  }
+
+  private readonly ESTADOS_ANIMO = [
+    'feliz', 'neutral', 'sorprendido', 'triste', 'molesto',
+    'disgustado', 'asustado', 'despectivo',
+  ] as const;
+
+  private normalizeEstado(raw: string): string {
+    const v = String(raw ?? '').trim().toLowerCase();
+    if (!v) return '';
+    const known = this.ESTADOS_ANIMO as readonly string[];
+    const idx = known.indexOf(v);
+    const base = idx >= 0 ? known[idx] : v;
+    return base.charAt(0).toUpperCase() + base.slice(1);
   }
 
   private normalizeItem = (x: any) => {
@@ -461,10 +468,7 @@ export class MonitoreoInstalacionComponent implements OnInit {
     const genero =
       g === 'hombre' ? 'Hombre' : g === 'mujer' ? 'Mujer' : x?.genero ?? '';
     const edad = x?.edad != null ? Number(x.edad) : null;
-    const er = String(x?.estado ?? x?.estadoAnimo ?? '')
-      .trim()
-      .toLowerCase();
-    const estado = er ? er.charAt(0).toUpperCase() + er.slice(1) : '';
+    const estado = this.normalizeEstado(x?.estado ?? x?.estadoAnimo ?? '');
     const id = x?.id != null ? Number(x.id) : null;
     const fechaRaw = (x?.fechaHora ?? x?.fecha ?? '').toString().trim();
     const fechaHora = fechaRaw ? this.parseFecha(fechaRaw) : null;
@@ -583,4 +587,44 @@ export class MonitoreoInstalacionComponent implements OnInit {
       return { rango, valor, color };
     });
   }
+
+  onTooltipShown = (e: any) => {
+    console.log('tooltipShown', e);
+  };
+  
+  onTooltipHidden = (e: any) => {
+    console.log('tooltipHidden', e);
+  };
+  
+  customizeHitsTooltip = (arg: any) => {
+    const etiqueta = arg?.argumentText ?? arg?.argument ?? '';
+    const valor = arg?.valueText ?? `${arg?.value ?? 0}`;
+    return { text: `${etiqueta}: ${valor}` };
+  };
+
+  customizeEdadTooltip = (arg: any) => {
+    const etiqueta = arg?.argumentText ?? arg?.argument ?? '';
+    const valor = arg?.valueText ?? `${arg?.value ?? 0}`;
+    return { text: `${etiqueta}: ${valor}` };
+  };
+
+  customizeEdadMujeresTooltip = (arg: any) => {
+    const etiqueta = arg?.argumentText ?? arg?.argument ?? '';
+    const valor = arg?.valueText ?? `${arg?.value ?? 0}`;
+    return { text: `Mujeres ${etiqueta}: ${valor} registros` };
+  };
+
+  customizeEdadHombresTooltip = (arg: any) => {
+    const etiqueta = arg?.argumentText ?? arg?.argument ?? '';
+    const valor = arg?.valueText ?? `${arg?.value ?? 0}`;
+    return { text: `Hombres ${etiqueta}: ${valor} registros` };
+  };
+
+  customizeHitsPorHoraTooltip = (arg: any) => {
+    const hora = arg?.argumentText ?? arg?.argument ?? '';
+    const valor = arg?.valueText ?? `${arg?.value ?? 0}`;
+    const genero = arg?.seriesName === 'Mujeres' ? 'Mujeres' : 'Hombres';
+    return { text: `${genero} ${hora}: ${valor} registros` };
+  };
+  
 }
