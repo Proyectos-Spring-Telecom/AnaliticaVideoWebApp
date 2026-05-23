@@ -83,14 +83,20 @@
                             <span class="input-group-text fw-bold">
                                 <mat-icon aria-hidden="true">layers</mat-icon>
                             </span>
-                            <div class="form-floating flex-grow-1 perm-select-floating">
-                                <select class="form-select" id="nroPiso" formControlName="nroPiso" [disabled]="!insEquipoForm.get('idSedeCentral')?.value">
-                                    <option [ngValue]="null" disabled>Selecciona un piso</option>
-                                    <option *ngFor="let piso of listaPisos" [ngValue]="piso.id">
-                                        {{ piso.nombre || piso.numero || `Piso ${piso.id}` }}
-                                    </option>
-                                </select>
-                                <label for="nroPiso">Selecciona un piso</label>
+                            <div class="form-floating flex-grow-1">
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="nroPiso"
+                                    formControlName="nroPiso"
+                                    placeholder="Ej.: 1"
+                                    inputmode="numeric"
+                                    autocomplete="off"
+                                    [disabled]="!insEquipoForm.get('idSedeCentral')?.value"
+                                    (keypress)="($event.charCode >= 48 && $event.charCode <= 57) || $event.preventDefault()"
+                                    (input)="filtrarSoloNumerosPiso($event)"
+                                />
+                                <label for="nroPiso">Número de piso</label>
                             </div>
                         </div>
                     </div>
