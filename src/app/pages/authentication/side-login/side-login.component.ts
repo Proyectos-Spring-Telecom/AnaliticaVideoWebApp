@@ -19,11 +19,14 @@ import { catchError, throwError } from 'rxjs';
 import Swal from 'sweetalert2';
 import { ToastrService } from 'ngx-toastr';
 import { Permiso } from 'src/app/entities/permiso.enum';
+import { authViewAnimation } from '../auth-view.animation';
 
 @Component({
   selector: 'app-side-login',
   imports: [RouterModule, MaterialModule, FormsModule, ReactiveFormsModule],
   templateUrl: './side-login.component.html',
+  styleUrls: ['./side-login.component.scss'],
+  animations: [authViewAnimation],
 })
 export class AppSideLoginComponent implements OnInit {
   options = this.settings.getOptions();

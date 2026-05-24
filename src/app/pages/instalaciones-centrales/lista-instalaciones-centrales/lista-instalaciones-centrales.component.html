@@ -53,12 +53,12 @@
                 <dxo-grouping #expand [autoExpandAll]="autoExpandAllGroups"></dxo-grouping>
 
                 <dxi-column caption="Acciones" cellTemplate="Acciones" alignment="center" *appHasPermission="['36', '38']" dataType="string"
-                    [width]="220"></dxi-column>
+                    [width]="200"></dxi-column>
 
-                <dxi-column dataField="nombreCliente" caption="Cliente" alignment="center"
+                <dxi-column dataField="nombreCliente" caption="Cliente" alignment="center" [width]="250"
                     dataType="number"></dxi-column>
 
-                <dxi-column dataField="nombre" caption="Nombre Instalación" alignment="center" dataType="string"
+                <dxi-column dataField="nombre" caption="Nombre Instalación" alignment="center" dataType="string" [width]="250"
                     cellTemplate="nomInstalacion">
                     <div *dxTemplate="let f of 'nomInstalacion' ">
                         <div *ngIf="f.data.nombre">{{ f.data.nombre }}</div>
@@ -66,7 +66,7 @@
                     </div>
                 </dxi-column>
 
-                <dxi-column dataField="nroPisos" caption="Número de Pisos" alignment="center" dataType="number"
+                <dxi-column dataField="nroPisos" caption="Número de Pisos" alignment="center" dataType="number" [width]="150"
                     cellTemplate="nroPisosTemplate">
                     <div *dxTemplate="let f of 'nroPisosTemplate'">
                         <div *ngIf="f.data.nroPisos !== null && f.data.nroPisos !== undefined">{{ f.data.nroPisos }}</div>
@@ -75,7 +75,7 @@
                 </dxi-column>
 
                 <dxi-column dataField="direccion" caption="Dirección" alignment="center" dataType="string"></dxi-column>
-                <dxi-column dataField="nombreEncargado" caption="Nombre Encargado" alignment="center"
+                <dxi-column dataField="nombreEncargado" caption="Nombre Encargado" alignment="center" [width]="250"
                     dataType="string"></dxi-column>
 
                 <dxi-column dataField="estatus" caption="Estatus" alignment="center" cellTemplate="est"
