@@ -74,7 +74,7 @@ export class CambioPasswordComponent implements OnInit {
   liveConfirmarPassword = '';
   token: string | null = null;
 
-  // Estado individual de cada reglas
+  // Estado individual de cada reglasss
   rulesStatus: {
     length: boolean;
     uppercase: boolean;
