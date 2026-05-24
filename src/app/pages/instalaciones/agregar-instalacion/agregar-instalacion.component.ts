@@ -77,6 +77,15 @@ export class AgregarInstalacionComponent implements OnInit, AfterViewInit {
     });
   }
 
+  filtrarSoloNumerosPiso(event: Event): void {
+    const el = event.target as HTMLInputElement;
+    const v = el.value.replace(/\D/g, '');
+    if (el.value !== v) {
+      el.value = v;
+    }
+    this.insEquipoForm.get('nroPiso')?.setValue(v === '' ? null : v, { emitEvent: false });
+  }
+
   onSedeCentralChange() {
     const idSedeCentral = this.insEquipoForm.get('idSedeCentral')?.value;
     // Limpiar el select de pisos cuando cambia la instalación central
